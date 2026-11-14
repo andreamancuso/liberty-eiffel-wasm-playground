@@ -323,8 +323,14 @@ aside p {
   border-color: transparent;
   font-size: 0.82rem;
 }
+.run-status {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-left: auto;
+}
 #status {
-  margin: 0 0 0 auto;
+  margin: 0;
   color: #71806b;
   font-size: 0.75rem;
 }
@@ -511,9 +517,12 @@ dialog .muted {
   .run-file {
     margin-left: auto;
   }
-  .run-toolbar #status {
+  .run-toolbar .run-status {
     width: 100%;
     margin-left: 0;
+  }
+  .download-percent {
+    margin-left: auto;
   }
   .editor .cm-content {
     min-height: 260px;

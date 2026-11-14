@@ -556,14 +556,16 @@ export default function App() {
               <button className="reset" disabled={busy} onClick={reset}>
                 Reset
               </button>
-              <p id="status" role="status">
-                {status}
-              </p>
-              {busy && downloadPercent !== null && (
-                <span className="download-percent" aria-hidden="true">
-                  {downloadPercent}%
-                </span>
-              )}
+              <div className="run-status">
+                <p id="status" role="status">
+                  {status}
+                </p>
+                {busy && downloadPercent !== null && (
+                  <span className="download-percent" aria-hidden="true">
+                    {downloadPercent}%
+                  </span>
+                )}
+              </div>
             </div>
             {busy && (
               <div
