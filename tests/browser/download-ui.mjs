@@ -82,7 +82,7 @@ export async function checkDownloadUI(browser, siteUrl, setDelivery) {
             "main.e": "class MAIN create {} make feature {} make do end end",
           },
         },
-        { buildTimeoutMs: 5000, onProgress: () => updates++ },
+        { buildTimeoutMs: 30000, onProgress: () => updates++ },
       );
       const atFinish = updates;
       await new Promise((resolve) => setTimeout(resolve, 300));

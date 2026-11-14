@@ -69,14 +69,20 @@ const server = createServer(async (req, res) => {
         ? { "Content-Encoding": "gzip" }
         : {}),
     });
-    if (["slow", "timeout", "unknown"].includes(mode) && file.endsWith(".gz")) {
+    if (mode === "timeout" && file.endsWith(".gz") && content.length > 524288) {
+      // Keep a real transfer open until the client's deadline closes it.
+      res.write(content.subarray(0, 524288));
+      await new Promise(resolve => res.once("close", resolve));
+      return;
+    }
+    if (["slow", "unknown"].includes(mode) && file.endsWith(".gz")) {
       for (
         let offset = 0;
         offset < content.length && !res.destroyed;
         offset += 524288
       ) {
         res.write(content.subarray(offset, offset + 524288));
-        await delay(mode === "timeout" ? 1000 : 100);
+        await delay(100);
       }
       res.end();
     } else res.end(content);
