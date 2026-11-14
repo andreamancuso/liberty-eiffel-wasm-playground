@@ -30,7 +30,6 @@ RUN LIBERTY_REVISION="$LIBERTY_REVISION" SOURCE_DIFF_SHA256="$SOURCE_DIFF_SHA256
     node -e 'require("fs").writeFileSync("/out/runtime/eiffel/provenance.json", JSON.stringify({sourceRepository:process.env.LIBERTY_REPOSITORY,sourceRevision:process.env.LIBERTY_REVISION,sourceTreeSha256:process.env.SOURCE_DIFF_SHA256,sourceDirty:process.env.SOURCE_DIRTY==="true",sourceMode:process.env.SOURCE_MODE,playgroundRevision:process.env.PLAYGROUND_REVISION,playgroundTreeSha256:process.env.PLAYGROUND_TREE_SHA256,bootstrapImage:process.env.BOOTSTRAP_IMAGE_ID,flags:"Liberty -boost -no_gc -split legacy; emcc -O2; stack 16 MiB; initial 64 MiB; max 1 GiB"},null,2)+"\n")'
 COPY --from=liberty_source /COPYING /out/licenses/Liberty-COPYING
 COPY --from=liberty_source /AUTHORS /out/licenses/Liberty-AUTHORS
-COPY tests/compiler/index.html /out/index.html
 COPY runtime/eiffel/client.mjs runtime/eiffel/worker.mjs runtime/eiffel/input.mjs /out/runtime/eiffel/
 COPY runtime/worker-request.mjs /out/runtime/
 

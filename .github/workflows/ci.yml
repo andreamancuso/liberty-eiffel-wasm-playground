@@ -10,6 +10,12 @@ on:
         type: boolean
         default: false
 
+      test_workers:
+        description: Independent browser groups to run concurrently
+        type: choice
+        options: ['2', '1']
+        default: '2'
+
 permissions:
   contents: read
 
@@ -50,7 +56,8 @@ jobs:
         env:
           BUILD_CACHE_WRITE: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
           COLD_BUILD: ${{ inputs.cold_build || false }}
-        run: ./build.ps1 -CiCache -ColdBuild:($env:COLD_BUILD -eq 'true')
+          TEST_WORKERS: ${{ inputs.test_workers || '2' }}
+        run: ./build.ps1 -CiCache -ColdBuild:($env:COLD_BUILD -eq 'true') -TestWorkers ([int]$env:TEST_WORKERS)
       - name: Seal the browser-verified candidate
         env:
           REVISION: ${{ github.sha }}
@@ -84,5 +91,8 @@ jobs:
           df -h /
           docker system df
           python3 build/summarize-builds.py artifacts/build-logs >> "$GITHUB_STEP_SUMMARY"
+          if test -f artifacts/browser-reports/browser-result.json; then
+            python3 tests/browser/summarize-report.py artifacts/browser-reports/browser-result.json >> "$GITHUB_STEP_SUMMARY"
+          fi
           echo "Build revision: $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
           echo "Manual Pages release: select CI run **$GITHUB_RUN_ID** after this main build succeeds. Artifacts expire after seven days." >> "$GITHUB_STEP_SUMMARY"

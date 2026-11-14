@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { mkdir, writeFile } from "node:fs/promises";
 import { initialize, translate } from "/out/runtime/eiffel/translator.mjs";
 let stdout = [],
   stderr = [];
@@ -29,6 +30,13 @@ console.log(
 );
 assert.equal(result.exitCode, 0);
 assert.ok(result.artifacts["hello.c"] && result.artifacts["hello.h"]);
+await mkdir("/out/validation/hello", { recursive: true });
+for (const name of ["hello.c", "hello.h"])
+  await writeFile(`/out/validation/hello/${name}`, result.artifacts[name]);
+await writeFile(
+  "/out/validation/hello/expected.json",
+  JSON.stringify({ stdout: "Node compiler smoke\n" }),
+);
 console.log(
   "PASS: WASM compiler version and Eiffel-to-C translation under Node.",
 );

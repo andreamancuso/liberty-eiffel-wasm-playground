@@ -183,6 +183,10 @@ export async function checkLearningUI(page, baseUrl, { full = false } = {}) {
     await page.evaluate(() => {
       location.hash = "example=objects";
     });
+    assert.equal(
+      await page.locator(".cm-content").getAttribute("contenteditable"),
+      "false",
+    );
     assert.equal(await page.locator("#example").inputValue(), "my-program");
     await page.locator("#stop").click();
     await page.waitForFunction(

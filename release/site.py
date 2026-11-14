@@ -40,6 +40,12 @@ def seal(root, report_path, revision, run_id, run_url):
     report = json.loads(report_path.read_text())
     if not report['passed'] or report['provenance']['playgroundRevision'] != revision:
         raise ValueError('Sealing requires a passing browser report for this revision')
+    groups = report.get('groups', [])
+    if sorted(group['name'] for group in groups) != ['api', 'ui'] or not all(group['passed'] and group['cases'] for group in groups):
+        raise ValueError('Sealing requires both successful browser groups')
+    cases = [case for group in groups for case in group['cases']]
+    if len(cases) != len(set(cases)) or cases != [result['name'] for result in report['results']]:
+        raise ValueError('Browser groups do not match the aggregate cases')
     if report['testedFiles'] != inventory(root):
         raise ValueError('Candidate differs from the files verified by the browser suite')
     manifest = dict(schemaVersion=1, playgroundRevision=revision,

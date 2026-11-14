@@ -5,9 +5,9 @@ import re
 import sys
 
 root = pathlib.Path(sys.argv[1])
-timings = root / 'timings.jsonl'
-if timings.exists():
-    measurements = [json.loads(line) for line in timings.read_text(encoding='utf-8-sig').splitlines()]
+timings = sorted(root.glob('*.timing.json'))
+if timings:
+    measurements = [json.loads(file.read_text(encoding='utf-8-sig')) for file in timings]
     mode = 'cold layers' if all(item['cold'] for item in measurements) else 'layer reuse enabled'
     print(f'Build mode: {mode}.\n')
     print('| Build | Seconds | Cached steps | Cache import/export seconds |')

@@ -11,4 +11,5 @@ assert.equal(result.status, "success");
 const execution = await execute(result.wasm, "");
 console.log(execution);
 assert.equal(execution.status, "success");
-assert.match(execution.stdout, /BrowserMarker/);
+const expected = JSON.parse(await readFile("/probe/expected.json", "utf8"));
+assert.equal(execution.stdout, expected.stdout);

@@ -23,7 +23,7 @@ function Invoke-DockerBuild {
     $code = $LASTEXITCODE
     $watch.Stop()
     $measurement = @{ name = $Name; elapsedSeconds = [Math]::Round($watch.Elapsed.TotalSeconds, 2); exitCode = $code; cold = [bool]$ColdBuild; ciCache = [bool]$CiCache }
-    $measurement | ConvertTo-Json -Compress | Add-Content -LiteralPath (Join-Path $logs 'timings.jsonl') -Encoding utf8
+    $measurement | ConvertTo-Json -Compress | Set-Content -LiteralPath (Join-Path $logs "$Name.timing.json") -Encoding utf8
     if ($code -ne 0) { throw "Docker build '$Name' failed with exit code $code. See $log" }
 }
 

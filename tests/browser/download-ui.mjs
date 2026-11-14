@@ -20,6 +20,11 @@ export async function checkDownloadUI(browser, siteUrl, setDelivery) {
       "class MAIN create {} make feature {} make do absent_feature end end",
     );
     assert.equal((await runUI(page)).status, "compiler_error");
+    assert.equal(await page.locator("#errors").isVisible(), true);
+    assert.match(
+      await page.locator("#diagnostics").textContent(),
+      /absent_feature/,
+    );
     assert.equal(await page.locator("#download-note").count(), 1);
 
     await setSource(
@@ -73,29 +78,7 @@ export async function checkDownloadUI(browser, siteUrl, setDelivery) {
     );
 
     setDelivery("timeout");
-    const timeout = await page.evaluate(async () => {
-      let updates = 0;
-      const result = await window.playground.buildAndRun(
-        {
-          rootClass: "main.e",
-          files: {
-            "main.e": "class MAIN create {} make feature {} make do end end",
-          },
-        },
-        { buildTimeoutMs: 30000, onProgress: () => updates++ },
-      );
-      const atFinish = updates;
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      return { status: result.status, phase: result.phase, atFinish, updates };
-    });
-    assert.equal(timeout.status, "timed_out");
-    assert.equal(timeout.phase, "loading_backend");
-    assert.ok(timeout.updates > 0);
-    assert.equal(timeout.updates, timeout.atFinish);
-    assert.equal(
-      await page.evaluate(() => window.playground.getActiveWorkerCount()),
-      0,
-    );
+    await checkDownloadTimeout(browser, siteUrl);
 
     setDelivery("missing");
     assert.equal((await runUI(page)).status, "initialization_error");
@@ -153,6 +136,63 @@ export async function checkDownloadUI(browser, siteUrl, setDelivery) {
     return { name: "download_progress_ui", status: "success" };
   } finally {
     setDelivery("normal");
+    await context.close();
+  }
+}
+
+async function checkDownloadTimeout(browser, siteUrl) {
+  const context = await browser.newContext();
+  try {
+    const page = await context.newPage();
+    await page.clock.install();
+    await page.goto(siteUrl);
+    await page.waitForFunction(() => !!window.playground);
+    // Do not return this promise: the test must advance the deadline while it runs.
+    await page.evaluate(() => {
+      window.timeoutProgress = [];
+      window.playground
+        .buildAndRun(
+          {
+            rootClass: "main.e",
+            files: {
+              "main.e": "class MAIN create {} make feature {} make do end end",
+            },
+          },
+          {
+            buildTimeoutMs: 30000,
+            onProgress: (value) => window.timeoutProgress.push(value),
+          },
+        )
+        .then((result) => {
+          window.timeoutResult = result;
+          window.progressAtTimeout = window.timeoutProgress.length;
+        });
+    });
+    await page.waitForFunction(
+      () =>
+        window.timeoutProgress.some(
+          (value) => value.phase === "loading_backend" && value.loadedBytes > 0,
+        ),
+      null,
+      { timeout: 600000 },
+    );
+    await page.clock.fastForward(30000);
+    await page.waitForFunction(() => !!window.timeoutResult);
+    const result = await page.evaluate(() => window.timeoutResult);
+    assert.equal(result.status, "timed_out");
+    assert.equal(result.phase, "loading_backend");
+    await page.clock.fastForward(1000);
+    assert.equal(
+      await page.evaluate(
+        () => window.timeoutProgress.length === window.progressAtTimeout,
+      ),
+      true,
+    );
+    assert.equal(
+      await page.evaluate(() => window.playground.getActiveWorkerCount()),
+      0,
+    );
+  } finally {
     await context.close();
   }
 }

@@ -26,7 +26,9 @@ class ReleaseIntegrity(unittest.TestCase):
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_text('fixture')
         (root / 'runtime/eiffel/provenance.json').write_text(json.dumps(provenance))
-        return dict(passed=True, provenance=provenance, testedFiles=site.inventory(root))
+        return dict(passed=True, provenance=provenance, testedFiles=site.inventory(root),
+                    groups=[dict(name=name, passed=True, cases=[name+'_case']) for name in ['api', 'ui']],
+                    results=[dict(name=name+'_case') for name in ['api', 'ui']])
 
     def test_seal_binds_the_manifest_to_the_tested_candidate(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -58,6 +60,26 @@ class ReleaseIntegrity(unittest.TestCase):
                     report['provenance']['sourceDirty'] = True
                     (root / 'runtime/eiffel/provenance.json').write_text(json.dumps(report['provenance']))
                     report['testedFiles'] = site.inventory(root)
+                report_path = pathlib.Path(directory) / 'browser-result.json'
+                report_path.write_text(json.dumps(report))
+                with self.assertRaises(ValueError):
+                    site.seal(root, report_path, 'a'*40, '123', 'https://example.test/run/123')
+
+    def test_seal_requires_complete_successful_groups(self):
+        for scenario in ['missing', 'failed', 'duplicate', 'empty', 'unlisted']:
+            with self.subTest(scenario=scenario), tempfile.TemporaryDirectory() as directory:
+                root = pathlib.Path(directory) / 'site'
+                report = self.candidate(root)
+                if scenario == 'missing':
+                    report['groups'].pop()
+                elif scenario == 'failed':
+                    report['groups'][1]['passed'] = False
+                elif scenario == 'duplicate':
+                    report['groups'].append(report['groups'][0])
+                elif scenario == 'empty':
+                    report['groups'][1]['cases'] = []
+                else:
+                    report['results'].pop()
                 report_path = pathlib.Path(directory) / 'browser-result.json'
                 report_path.write_text(json.dumps(report))
                 with self.assertRaises(ValueError):
