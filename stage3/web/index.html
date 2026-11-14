@@ -1,0 +1,55 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Liberty Eiffel playground</title><link rel="icon" href="data:,">
+<style>body{font:16px system-ui;max-width:1000px;margin:2rem auto;padding:0 1rem;background:#f7f8fa;color:#20242a}textarea,pre{box-sizing:border-box;width:100%;font:14px ui-monospace,monospace;padding:1rem;background:white;border:1px solid #bbc3cc;border-radius:4px}textarea{height:230px}#stdin{height:85px}pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:340px;overflow:auto}button,input,select{font:inherit;padding:.4rem;margin:.3rem 0}label{display:block}#status{min-height:1.5em}</style>
+<h1>Liberty Eiffel playground</h1><p>Compile and run Eiffel entirely in your browser. <a href="./stage2/">Open the Eiffel-to-C compiler</a>.</p>
+<p><strong>Experimental beta — desktop Chrome or Edge recommended.</strong> The first run downloads about 33 MB and needs substantial browser memory. Small console programs are the current target; garbage collection, rescue/retry, graphics, and native bindings are unsupported.</p>
+<p>A project for <a href="https://beyond-tabs.com">Beyond Tabs</a> · <a href="https://github.com/andreamancuso/liberty-eiffel-wasm-playground">Source and issues</a>. Your source and program input stay in your browser.</p>
+<label>Source filename <input id="filename" value="hello.e" spellcheck="false"></label>
+<label for="source">Eiffel source</label><textarea id="source" spellcheck="false">class HELLO
+create {}
+   make
+feature {}
+   make
+      do
+         io.put_string("Hello from Eiffel in your browser!%N")
+      end
+end
+</textarea>
+<label for="stdin">Program input (supplied before Run; EOF afterward)</label><textarea id="stdin" spellcheck="false"></textarea>
+<button id="run">Build &amp; Run</button> <button id="stop" disabled>Stop</button><p id="status" role="status">Ready.</p>
+<h2>Program output</h2><pre id="stdout"></pre><h2>Program errors</h2><pre id="stderr"></pre>
+<h2>Compiler diagnostics</h2><pre id="diagnostics"></pre>
+<h2>Generated source</h2><select id="artifacts" aria-label="Generated file" disabled></select> <button id="download" disabled>Download selected file</button><pre id="generated"></pre>
+<script type="module">
+import { buildAndRun, getActiveWorkerCount } from './client.mjs';
+window.stage3 = { buildAndRun, getActiveWorkerCount };
+const el = id => document.getElementById(id);
+let controller, artifacts = {};
+el('stop').onclick = () => controller?.abort();
+el('artifacts').onchange = () => { el('generated').textContent = artifacts[el('artifacts').value] ?? ''; };
+el('run').onclick = async () => {
+    controller = new AbortController(); artifacts = {};
+    for (const id of ['stdout','stderr','diagnostics','generated']) el(id).textContent = '';
+    el('artifacts').replaceChildren(); el('artifacts').disabled = el('download').disabled = true;
+    el('run').disabled = true; el('stop').disabled = false;
+    const filename = el('filename').value;
+    const labels = { loading_frontend:'Loading Eiffel compiler…', eiffel_compile:'Compiling Eiffel…', loading_backend:'Loading C compiler and libraries…', c_compile:'Compiling C…', link:'Linking…', loading_program:'Loading program…', execute:'Running…' };
+    const result = await buildAndRun({ rootClass: filename, files: { [filename]: el('source').value }, stdin: el('stdin').value }, {
+        signal: controller.signal, onPhase: phase => { el('status').textContent = labels[phase] ?? phase; },
+        onOutput: (text, fd) => { el(fd === 2 ? 'stderr' : 'stdout').textContent += text; },
+    });
+    window.stage3.lastResult = result;
+    el('stdout').textContent = result.stdout; el('stderr').textContent = result.stderr;
+    el('diagnostics').textContent = [result.diagnostics, result.error].filter(Boolean).join('\n') || 'No compiler diagnostics.';
+    el('status').textContent = `${result.status} · ${(result.elapsedMs / 1000).toFixed(2)} s${result.exitCode === null ? '' : ` · exit ${result.exitCode}`}`;
+    artifacts = result.artifacts ?? {};
+    for (const name of Object.keys(artifacts).sort()) el('artifacts').add(new Option(name, name));
+    el('artifacts').disabled = el('download').disabled = !Object.keys(artifacts).length;
+    el('artifacts').onchange(); el('run').disabled = false; el('stop').disabled = true;
+};
+el('download').onclick = () => {
+    const name = el('artifacts').value, url = URL.createObjectURL(new Blob([artifacts[name]], { type:'text/plain;charset=utf-8' }));
+    const link = document.createElement('a'); link.href = url; link.download = name; link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
+</script></html>

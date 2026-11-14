@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import { buildC, execute } from '/out/wasi.mjs';
+const artifacts = { 'hello.c': await readFile('/probe/hello.c', 'utf8'), 'hello.h': await readFile('/probe/hello.h', 'utf8') };
+const result = await buildC(artifacts, phase => console.log(phase));
+console.log(result.status, result.diagnostics);
+assert.equal(result.status, 'success');
+const execution = await execute(result.wasm, '');
+console.log(execution);
+assert.equal(execution.status, 'success');
+assert.match(execution.stdout, /BrowserMarker/);

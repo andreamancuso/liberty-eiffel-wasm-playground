@@ -1,9 +1,9 @@
 # Liberty Eiffel WASM playground
 
-A browser-only Liberty Eiffel compiler experiment for beyond-tabs.com. The
-current harness translates edited Eiffel into C in a WebAssembly worker, shows
-diagnostics, and lets you inspect and download generated files. Browser-side C
-compilation and execution are the next milestone.
+A browser-only Liberty Eiffel playground experiment for beyond-tabs.com. Stage 3
+compiles edited Eiffel to C, compiles and links that C to WebAssembly, and runs
+the program entirely in browser workers. It supports pre-supplied stdin,
+separate stdout/stderr, diagnostics, cancellation and generated-source downloads.
 
 The playground owns the Docker recipes, asset packaging, worker API, interface,
 integration tests, and measurements. Liberty compiler/runtime changes belong in
@@ -18,7 +18,7 @@ Requirements: Git, PowerShell, and Docker Desktop with Linux containers.
 ```powershell
 cd C:\dev\liberty-eiffel-wasm-playground
 git submodule update --init --recursive
-.\build-stage2.ps1
+.\build-stage3.ps1
 ```
 
 The default build uses the clean, pinned `liberty` checkout. The runner initializes
@@ -29,7 +29,7 @@ Emscripten 7.0.0 and the other build images are pinned by digest.
 For source development, explicitly select your fork checkout instead:
 
 ```powershell
-.\build-stage2.ps1 -LibertySource C:\dev\LibertyFork
+.\build-stage3.ps1 -LibertySource C:\dev\LibertyFork
 ```
 
 The override may contain uncommitted source changes. Reports identify its Git
@@ -38,17 +38,21 @@ from the playground revision and fingerprint. `-RebuildNative` rebuilds the
 native bootstrap seed from the selected source. Source changes are made in the
 fork, then committed and selected by updating this repo's submodule pin.
 
-The stage 2 runner checks Node initialization, browser translation, diagnostics,
-cancellation, timeout and failure recovery, the editable UI, and downloads. It
-also compiles browser-generated C offline and executes the resulting WASM, and
-runs stage 1 regressions. Tests use static HTTP and disabled external networking.
+The stage 3 runner verifies the complete browser pipeline, contracts, UTF-8
+stdin/EOF, errors, cancellation, resource limits, recovery and the editable UI.
+It also runs stage 1 and stage 2 regressions. Tests use static HTTP and disabled
+external networking. Small educational console programs are the target;
+garbage collection and rescue/retry are currently unsupported.
 
-- [Stage 2 guide: harness, API, measurements, and limits](stage2/README.md)
+- [Stage 3 guide: build and run, API, limits, and evidence](stage3/README.md)
+- [Recorded stage 3 results](stage3-result.json)
+- [Stage 2 guide: Eiffel-to-C API and measurements](stage2/README.md)
 - [Recorded stage 2 results](stage2-result.json)
 - [Stage 1 guide: ahead-of-time compilation experiment](docs/stage1.md)
+- [Standalone GitHub Pages beta: CI, manual publishing, and rollback](docs/publishing.md)
 
 Generated files, caches, logs, and screenshots remain under `artifacts/`, ignored
-by Git. `artifacts/stage2/stage2-browser.png` shows the verified browser harness.
+by Git. `artifacts/stage3/stage3-browser.png` shows the verified browser harness.
 
 ## Source pin and publishing
 

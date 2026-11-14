@@ -11,7 +11,7 @@ try {
     $nativeImageId = Ensure-NativeCompiler $source -Rebuild:$RebuildNative
     $playgroundRevision = & git rev-parse --verify HEAD 2>$null
     if ($LASTEXITCODE -ne 0) { $playgroundRevision = 'uncommitted' }
-    $playgroundHash = Get-TreeFingerprint $PSScriptRoot @('stage2-result.json')
+    $playgroundHash = Get-TreeFingerprint $PSScriptRoot @('stage2-result.json', 'stage3-result.json')
     Write-Output "Liberty $($source.Revision) ($($source.Mode)); source fingerprint $($source.TreeSha256)"
     $build = @('build', '--platform', 'linux/amd64', '-f', 'Dockerfile.stage2', '--target', 'artifacts',
         '--build-context', "liberty_source=$($source.Path)",
