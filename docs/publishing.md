@@ -56,7 +56,7 @@ upload/deploy actions without rebuilding. Publishing is manual and serialized.
 Only the deployment job gets Pages/OIDC write permissions; no long-lived
 deployment secret is needed.
 
-After deployment, Chromium tests the public HTTPS address with fresh edited
+After deployment, the verifier from the selected release tests the public HTTPS address with Chromium, fresh edited
 source, UTF-8 stdin, visible Eiffel errors, quiet successful runs, Stop, and
 recovery. It checks the release revision, module/WASM delivery, and same-origin
 GET-only requests. The workflow summary links the site and reports timings;
