@@ -2,7 +2,7 @@ import { compile, getActiveWorkerCount as frontendWorkers } from './stage2/clien
 const workers = new Set();
 export const getActiveWorkerCount = () => workers.size + frontendWorkers();
 
-function request(data, { signal, timeoutMs, onPhase, onOutput }, transfer = []) {
+function request(data, { signal, timeoutMs, onPhase, onOutput, onProgress }, transfer = []) {
     return new Promise(resolve => {
         let worker, timer, done = false, phase = data.action === 'build' ? 'loading_backend' : 'loading_program';
         let stdout = '', stderr = '';
@@ -17,8 +17,10 @@ function request(data, { signal, timeoutMs, onPhase, onOutput }, transfer = []) 
         try {
             worker = new Worker(new URL('./worker.mjs', import.meta.url), { type: 'module' }); workers.add(worker);
             worker.onmessage = ({ data }) => {
+                if (done) return;
                 try {
                     if (data.type === 'phase') { phase = data.phase; onPhase(phase); }
+                    if (data.type === 'progress') onProgress(data.progress);
                     if (data.type === 'output') {
                         if (data.fd === 2) stderr += data.text; else stdout += data.text;
                         onOutput(data.text, data.fd);
@@ -26,7 +28,7 @@ function request(data, { signal, timeoutMs, onPhase, onOutput }, transfer = []) 
                     if (data.type === 'result') finish(data.result);
                 } catch (error) { finish({ status: 'runtime_error', error: String(error) }); }
             };
-            worker.onerror = event => { event.preventDefault(); finish({ status: phase.startsWith('loading') ? 'initialization_error' : 'runtime_error', error: event.message }); };
+            worker.onerror = event => { event.preventDefault(); finish({ status: /^(loading|preparing)_/.test(phase) ? 'initialization_error' : 'runtime_error', error: event.message }); };
             worker.onmessageerror = () => finish({ status: 'runtime_error', error: 'Invalid worker response.' });
             signal?.addEventListener('abort', abort, { once: true });
             timer = setTimeout(() => finish({ status: 'timed_out', exitCode: null }), timeoutMs);
@@ -35,7 +37,7 @@ function request(data, { signal, timeoutMs, onPhase, onOutput }, transfer = []) 
     });
 }
 
-export async function buildAndRun(input, { signal, onPhase = () => {}, onOutput = () => {}, buildTimeoutMs = 600000, runTimeoutMs = 10000 } = {}) {
+export async function buildAndRun(input, { signal, onPhase = () => {}, onOutput = () => {}, onProgress = () => {}, buildTimeoutMs = 600000, runTimeoutMs = 10000 } = {}) {
     const started = performance.now(), timings = {}, phases = [];
     let previous = started, phase = 'loading_frontend';
     const progress = value => {
@@ -54,11 +56,11 @@ export async function buildAndRun(input, { signal, onPhase = () => {}, onOutput 
     if (front.status !== 'success') return finish({ status: front.status, exitCode: front.exitCode, diagnostics: [...front.stdout, ...front.stderr].join('\n'), artifacts: {} });
     const remaining = buildTimeoutMs - (performance.now() - started);
     if (remaining <= 0) return finish({ status: 'timed_out', artifacts: front.artifacts });
-    const back = await request({ action: 'build', artifacts: front.artifacts }, { signal, timeoutMs: remaining, onPhase: progress, onOutput });
+    const back = await request({ action: 'build', artifacts: front.artifacts }, { signal, timeoutMs: remaining, onPhase: progress, onOutput, onProgress });
     const common = { artifacts: front.artifacts, diagnostics: back.diagnostics ?? back.error ?? '', memories: { frontend: front.linearMemoryBytes, ...back.memories }, frontendResources: front.resources, backendResources: back.resources };
     if (back.status !== 'success') return finish({ ...common, ...back, wasm: undefined });
     const wasmBytes = back.wasm.byteLength;
     const result = await request({ action: 'execute', wasm: back.wasm, stdin: input.stdin ?? '' },
-        { signal, timeoutMs: runTimeoutMs, onPhase: progress, onOutput }, [back.wasm]);
+        { signal, timeoutMs: runTimeoutMs, onPhase: progress, onOutput, onProgress }, [back.wasm]);
     return finish({ ...common, ...result, wasmBytes });
 }

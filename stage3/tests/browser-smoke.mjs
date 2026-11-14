@@ -6,10 +6,13 @@ import { chromium } from 'playwright';
 import { hello, multi, invalid } from './stage2-fixtures.mjs';
 import { setSource, checkLearningUI, checkUnavailableStorage, checkLibraryUI } from './ui-checks.mjs';
 import { libraryCases } from './library-fixtures.mjs';
+import { checkDownloadUI } from './download-ui.mjs';
+import { setTimeout as delay } from 'node:timers/promises';
 const root = '/artifacts', requests = [], errors = [], results = [];
 const basePath = process.env.SITE_BASE_PATH ?? '/liberty-eiffel-wasm-playground/';
 assert.match(basePath, /^\/(?:[a-zA-Z0-9_-]+\/)*$/);
 let encodedGzip = false;
+let delivery = 'normal';
 await rm(`${root}/stage3-result.json`, { force: true });
 const types = { '.html':'text/html', '.mjs':'text/javascript', '.js':'text/javascript', '.css':'text/css', '.wasm':'application/wasm', '.json':'application/json' };
 const server = createServer(async (req, res) => {
@@ -20,8 +23,20 @@ const server = createServer(async (req, res) => {
         const file = path.resolve(root, relative.endsWith('/') || !relative ? relative + 'index.html' : relative);
         if (!file.startsWith(root + '/')) { res.writeHead(403).end(); return; }
         const content = await readFile(file);
+        const mode = delivery;
         requests.push({ method:req.method, path:pathname, bytes:content.length });
-        res.writeHead(200, { 'Content-Type':types[path.extname(file)] ?? 'application/octet-stream', 'Cache-Control': encodedGzip ? 'no-store' : 'public,max-age=3600', ...(encodedGzip && file.endsWith('.gz') ? { 'Content-Encoding':'gzip' } : {}) }); res.end(content);
+        if (mode === 'missing' && file.endsWith('clang.wasm.gz')) { res.writeHead(404).end(); return; }
+        res.writeHead(200, { 'Content-Type':types[path.extname(file)] ?? 'application/octet-stream',
+            'Cache-Control': encodedGzip || mode !== 'normal' ? 'no-store' : 'public,max-age=3600',
+            ...(mode !== 'unknown' ? { 'Content-Length': content.length } : {}),
+            ...(encodedGzip && file.endsWith('.gz') ? { 'Content-Encoding':'gzip' } : {}) });
+        if (['slow', 'timeout', 'unknown'].includes(mode) && file.endsWith('.gz')) {
+            for (let offset = 0; offset < content.length && !res.destroyed; offset += 524288) {
+                res.write(content.subarray(offset, offset + 524288));
+                await delay(mode === 'timeout' ? 1000 : 100);
+            }
+            res.end();
+        } else res.end(content);
     } catch { res.writeHead(404).end(); }
 });
 await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
@@ -90,7 +105,7 @@ try {
     assert.equal((await backend('c_error','int main( {')).status,'c_compile_error');
     assert.equal((await backend('link_error','extern void absent(void); int main(void){absent();return 0;}')).status,'link_error');
     assert.equal((await backend('trap','int main(void){__builtin_trap();}')).status,'runtime_error');
-    for(const phase of ['loading_frontend','eiffel_compile','loading_backend','c_compile','link','execute']) {
+    for(const phase of ['loading_frontend','eiffel_compile','loading_backend','preparing_backend','c_compile','link','preparing_program','execute']) {
         result = await page.evaluate(async ({input,phase}) => {
             const controller=new AbortController();
             return window.stage3.buildAndRun(input,{signal:controller.signal,onPhase:value=>{if(value===phase)controller.abort();}});
@@ -134,6 +149,7 @@ try {
     results.push(await checkLearningUI(page, siteUrl, { full:true }));
     results.push(await checkLibraryUI(page, siteUrl));
     await checkUnavailableStorage(browser, siteUrl);
+    results.push(await checkDownloadUI(browser, siteUrl, value => { delivery = value; }));
     assert.deepEqual(errors, []);
     // A fresh context prevents the opaque response cache masking HTTP decoding.
     encodedGzip = true;
@@ -141,10 +157,16 @@ try {
     try {
         const encodedPage = await encodedContext.newPage();
         await encodedPage.goto(siteUrl); await encodedPage.waitForFunction(() => !!window.stage3);
-        const encodedResult = await encodedPage.evaluate(input => window.stage3.buildAndRun(input), hello(marker+'_encoded'));
+        const { encodedResult, progress } = await encodedPage.evaluate(async input => {
+            const progress = [];
+            const encodedResult = await window.stage3.buildAndRun(input, { onProgress: value => progress.push(value) });
+            return { encodedResult, progress };
+        }, hello(marker+'_encoded'));
         record('http_encoded_gzip', encodedResult);
         assert.equal(encodedResult.status, 'success', encodedResult.diagnostics);
         assert.equal(encodedResult.stdout, marker+'_encoded\n');
+        assert.ok(progress.some(value => value.loadedBytes > 0));
+        assert.ok(progress.every(value => value.totalBytes === null));
         assert.equal(await encodedPage.evaluate(() => window.stage3.getActiveWorkerCount()), 0);
     } finally { await encodedContext.close(); }
     const provenance=JSON.parse(await readFile(`${root}/stage2/provenance.json`,'utf8'));

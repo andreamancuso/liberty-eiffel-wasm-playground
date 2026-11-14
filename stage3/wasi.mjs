@@ -1,4 +1,5 @@
 import API from './toolchain/runtime.mjs';
+import { createDownloads } from './download.mjs';
 export const OUTPUT_LIMIT = 1048576;
 export class OutputLimitError extends Error {}
 
@@ -49,7 +50,7 @@ export class ConsoleFS extends API.MemFS {
     }
 }
 
-export async function readBuffer(name) {
+export async function readBuffer(name, download) {
     const url = new URL(`./toolchain/${name}`, import.meta.url);
     if (url.protocol === 'file:') {
         const data = await (await import('node:fs/promises')).readFile(url);
@@ -59,7 +60,7 @@ export async function readBuffer(name) {
     if (!response.ok) throw new Error(`Cannot load ${name}: HTTP ${response.status}`);
     // fetch decodes Content-Encoding automatically. Some static hosts serve .gz
     // as opaque files, while others attach that header; support both deliveries.
-    let bytes = new Uint8Array(await response.arrayBuffer());
+    let bytes = download ? await download(name, response) : new Uint8Array(await response.arrayBuffer());
     if (bytes[0] === 0x1f && bytes[1] === 0x8b)
         bytes = new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer());
     const valid = name.endsWith('.wasm')
@@ -68,7 +69,7 @@ export async function readBuffer(name) {
     if (!valid) throw new Error(`Cannot load ${name}: invalid toolchain payload`);
     return bytes.buffer;
 }
-export async function readModule(name) { return WebAssembly.compile(await readBuffer(name)); }
+export async function readModule(name, download) { return WebAssembly.compile(await readBuffer(name, download)); }
 
 export async function runApp(module, fs, name, args = [], onStart = () => {}) {
     const app = new API.App(module, fs, name, ...args);
@@ -80,8 +81,8 @@ export async function runApp(module, fs, name, args = [], onStart = () => {}) {
     return { exitCode, linearMemoryBytes: app.exports.memory.buffer.byteLength };
 }
 
-export async function createToolchain(onDiagnostic) {
-    const api = new API({ readBuffer, compileStreaming: readModule, hostWrite: onDiagnostic, MemFS: ConsoleFS,
+export async function createToolchain(onDiagnostic, download) {
+    const api = new API({ readBuffer: name => readBuffer(name, download), compileStreaming: name => readModule(name, download), hostWrite: onDiagnostic, MemFS: ConsoleFS,
         clang: 'clang.wasm', lld: 'lld.wasm', memfs: 'memfs.wasm', sysroot: 'sysroot.tar',
         clangResourceInclude: '/lib/clang/22/include',
         clangExtraArgs: ['-internal-isystem', '/include/wasm32-wasip1'],
@@ -90,14 +91,16 @@ export async function createToolchain(onDiagnostic) {
     return api;
 }
 
-export async function buildC(artifacts, onPhase = () => {}) {
+export async function buildC(artifacts, onPhase = () => {}, onProgress = () => {}) {
     if (Object.values(artifacts).some(text => /^\s*#\s*define\s+SE_EXCEPTIONS\b/m.test(text)))
         return { status: 'unsupported_feature', phase: 'c_compile', diagnostics: 'rescue/retry is not supported by this WASI runtime.', wasm: null };
     let diagnostics = '', phase = 'loading_backend';
     const diagnostic = text => { diagnostics += text; if (diagnostics.length > OUTPUT_LIMIT) throw new OutputLimitError('Compiler diagnostics exceeded 1 MiB.'); };
+    const download = createDownloads(['clang.wasm', 'lld.wasm', 'memfs.wasm', 'sysroot.tar'], onProgress,
+        () => { phase = 'preparing_backend'; onPhase(phase); });
     try {
         onPhase(phase);
-        const [api, clang, lld] = await Promise.all([createToolchain(diagnostic), readModule('clang.wasm'), readModule('lld.wasm')]);
+        const [api, clang, lld] = await Promise.all([createToolchain(diagnostic, download), readModule('clang.wasm', download), readModule('lld.wasm', download)]);
         diagnostics = '';
         api.memfs.addDirectory('work');
         for (const [name, text] of Object.entries(artifacts)) {
@@ -125,13 +128,14 @@ export async function buildC(artifacts, onPhase = () => {}) {
         if (linked.exitCode !== 0) return { status: 'link_error', phase, diagnostics, exitCode: linked.exitCode };
         memories.lld = linked.linearMemoryBytes;
         return { status: 'success', phase, diagnostics, wasm: api.memfs.getFileContents('work/program.wasm').slice().buffer, memories };
-    } catch (error) { return { status: phase === 'loading_backend' ? 'initialization_error' : 'backend_error', phase, diagnostics: diagnostics + '\n' + (error.stack || error), wasm: null }; }
+    } catch (error) { return { status: phase === 'loading_backend' || phase === 'preparing_backend' ? 'initialization_error' : 'backend_error', phase, diagnostics: diagnostics + '\n' + (error.stack || error), wasm: null }; }
 }
 
-export async function execute(wasm, stdin, onOutput = () => {}, onStart = () => {}) {
+export async function execute(wasm, stdin, onOutput = () => {}, onStart = () => {}, onProgress = () => {}, onDownloaded = () => {}) {
     let stdout = '', stderr = '';
     const output = (text, fd) => { if (fd === 2) stderr += text; else stdout += text; onOutput(text, fd); };
-    const fs = new ConsoleFS({ compileStreaming: readModule, memfsFilename: 'memfs.wasm', hostWrite: output });
+    const download = createDownloads(['memfs.wasm'], onProgress, onDownloaded);
+    const fs = new ConsoleFS({ compileStreaming: name => readModule(name, download), memfsFilename: 'memfs.wasm', hostWrite: output });
     await fs.ready;
     fs.setInput(stdin);
     try {

@@ -2,6 +2,8 @@ param([string]$LibertySource, [switch]$RebuildNative)
 $ErrorActionPreference = 'Stop'
 Push-Location $PSScriptRoot
 try {
+    node --test stage3/tests/download.test.mjs
+    if ($LASTEXITCODE -ne 0) { throw 'Download progress regressions failed.' }
     $site = Join-Path $PSScriptRoot 'artifacts/stage3'
     $frontend = Join-Path $PSScriptRoot 'artifacts/stage2'
     $report = Join-Path $site 'stage3-result.json'

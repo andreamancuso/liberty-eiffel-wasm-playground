@@ -10,7 +10,7 @@ FROM ${TOOLCHAIN_IMAGE} AS site
 COPY --from=stage2_output /compiler.mjs /compiler.wasm /compiler.data /runtime.mjs /client.mjs /worker.mjs /provenance.json /out/stage2/
 COPY --from=stage2_output /licenses/ /out/licenses/liberty/
 COPY stage2/web/ /out/stage2/
-COPY stage3/client.mjs stage3/worker.mjs stage3/wasi.mjs /out/
+COPY stage3/client.mjs stage3/worker.mjs stage3/wasi.mjs stage3/download.mjs /out/
 COPY --from=frontend /ui/dist/ /out/
 FROM scratch AS artifacts
 COPY --from=site /out/ /

@@ -39,6 +39,14 @@ const statusMessages: Record<string, string> = {
   runtime_error: "Your program stopped unexpectedly",
   initialization_error: "Could not prepare the playground. Please try again.",
 };
+const phaseMessages: Record<string, string> = {
+  loading_frontend: "Loading compiler…",
+  loading_backend: "Loading tools…",
+  preparing_backend: "Preparing compiler…",
+  loading_program: "Loading program…",
+  preparing_program: "Preparing program…",
+  execute: "Running…",
+};
 type DialogKind = "add" | "rename" | "delete" | "reset";
 
 function ProjectDialog({
@@ -143,6 +151,8 @@ export default function App() {
     running = useRef(false);
   const [ready, setReady] = useState(false);
   const [status, setStatus] = useState("Ready.");
+  const [downloadPercent, setDownloadPercent] = useState<number | null>(null);
+  const [showDownloadNote, setShowDownloadNote] = useState(true);
   const [stdout, setStdout] = useState(""),
     [stderr, setStderr] = useState("");
   const [result, setResult] = useState<RunResult | null>(null);
@@ -165,6 +175,7 @@ export default function App() {
     setStdout("");
     setStderr("");
     setStatus("Ready.");
+    setDownloadPercent(null);
     setJump(null);
   };
   const choose = (id: string) => {
@@ -227,14 +238,18 @@ export default function App() {
         },
         {
           signal: controller.current.signal,
-          onPhase: (phase) =>
-            setStatus(
-              phase === "execute"
-                ? "Running…"
-                : phase.startsWith("loading_")
-                  ? "Preparing…"
-                  : "Compiling…",
-            ),
+          onPhase: (phase) => {
+            setDownloadPercent(null);
+            setStatus(phaseMessages[phase] ?? "Compiling…");
+          },
+          onProgress: ({ loadedBytes, totalBytes }) => {
+            if (!running.current) return;
+            setDownloadPercent(
+              totalBytes === null
+                ? null
+                : Math.min(100, Math.floor((100 * loadedBytes) / totalBytes)),
+            );
+          },
           onOutput: (text, fd) => {
             if (fd === 2) setStderr((previous) => previous + text);
             else setStdout((previous) => previous + text);
@@ -243,6 +258,7 @@ export default function App() {
       );
       runtime.lastResult = completed;
       setResult(completed);
+      if (completed.status === "success") setShowDownloadNote(false);
       setStdout(completed.stdout);
       setStderr(completed.stderr);
       setStatus(
@@ -253,6 +269,7 @@ export default function App() {
     } finally {
       running.current = false;
       setBusy(false);
+      setDownloadPercent(null);
       controller.current = null;
       if (pendingHash.current !== null) {
         const hash = pendingHash.current;
@@ -542,7 +559,33 @@ export default function App() {
               <p id="status" role="status">
                 {status}
               </p>
+              {busy && downloadPercent !== null && (
+                <span className="download-percent" aria-hidden="true">
+                  {downloadPercent}%
+                </span>
+              )}
             </div>
+            {busy && (
+              <div
+                id="run-progress"
+                className={`run-progress${downloadPercent === null ? " indeterminate" : ""}`}
+                role="progressbar"
+                aria-labelledby="status"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={downloadPercent ?? undefined}
+              >
+                <span
+                  style={downloadPercent === null ? undefined : { width: `${downloadPercent}%` }}
+                />
+              </div>
+            )}
+            {showDownloadNote && (
+              <p id="download-note" className="download-note">
+                The first run downloads around 25 MB of compiler tools. Everything
+                runs in your browser.
+              </p>
+            )}
             <section className="output" aria-labelledby="output-title">
               <h2 id="output-title">Output</h2>
               <pre id="stdout">

@@ -30,6 +30,7 @@ try {
     page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
     await page.goto(url.href);
     await page.waitForFunction(() => !!window.stage3);
+    assert.match(await page.locator('#download-note').textContent(), /around 25 MB/);
     const manifestResponse = await context.request.get(new URL(`release.json?verify=${revision}`, url).href);
     assert.ok(manifestResponse.ok());
     const manifest = await manifestResponse.json();
@@ -54,6 +55,8 @@ try {
     let result = await runUI('edited_source', hello(marker).files['hello.e']);
     assert.equal(result.status, 'success', result.diagnostics);
     assert.equal(result.stdout, marker+'\n');
+    assert.equal(await page.locator('#download-note').count(), 0);
+    assert.equal(await page.locator('#run-progress').count(), 0);
     assert.equal(await page.locator('#errors').isVisible(), false);
     assert.equal(await page.locator('#artifacts, #download, #generated, a[href="./stage2/"]').count(), 0);
     result = await runUI('utf8_stdin', 'class HELLO create {} make feature {} make do io.read_line; io.put_string(io.last_string); io.put_new_line end end', 'Żółw🙂\n');

@@ -101,6 +101,7 @@ const result = await buildAndRun({
 }, {
     signal: controller.signal,
     onPhase: phase => console.log(phase),
+    onProgress: ({ phase, loadedBytes, totalBytes }) => console.log(phase, loadedBytes, totalBytes),
     onOutput: (text, fd) => console.log(fd === 2 ? 'stderr' : 'stdout', text),
 });
 ```
@@ -108,6 +109,20 @@ const result = await buildAndRun({
 The input extends stage 2's filename-to-Eiffel-source mapping with optional
 UTF-8 stdin text. Input is available before execution and exhaustion returns EOF;
 programs cannot wait for new interactive terminal input in this milestone.
+
+The optional `onProgress` callback reports backend response-body bytes within the
+current loading phase. `totalBytes` is null until all expected lengths are known,
+and stays null when HTTP decompression makes those lengths incomparable. It is
+not a percentage of total compilation time or a measure of network traffic on
+cached runs. Progress is throttled to roughly ten updates per second, with extra
+updates at response boundaries. `preparing_backend` and `preparing_program`
+separate completed transfers from tool initialization; the initial Eiffel loader
+continues to use indeterminate `loading_frontend` progress.
+
+The UI explains the approximately 25 MB cold download on the current Pages host.
+That note disappears after a successful run until the page is reloaded. Browser
+caching may reduce later transfers; no permanent cache or stored preference is
+introduced.
 
 Results identify `status`, `phase`, `exitCode` or null, separate `stdout` and
 `stderr`, compiler `diagnostics`, any runtime `error`, generated `artifacts`,

@@ -389,6 +389,42 @@ pre {
   color: #894b37;
   margin-bottom: 0.7rem;
 }
+.download-note {
+  margin: 0 1rem 1rem;
+  color: #64715f;
+  font-size: 0.8rem;
+}
+.download-percent {
+  font-size: 0.8rem;
+  color: #64715f;
+  font-variant-numeric: tabular-nums;
+}
+.run-progress {
+  height: 4px;
+  margin: 0 1rem 1rem;
+  border-radius: 2px;
+  overflow: hidden;
+  background: #e5eadf;
+}
+.run-progress span {
+  display: block;
+  height: 100%;
+  background: #315d43;
+}
+.run-progress.indeterminate span {
+  width: 30%;
+  animation: loading-progress 1.5s ease-in-out infinite alternate;
+}
+@keyframes loading-progress {
+  from { transform: translateX(0); }
+  to { transform: translateX(233%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .run-progress.indeterminate span {
+    animation: none;
+    margin-inline: auto;
+  }
+}
 .saving-notice {
   font-size: 0.85rem;
   color: #7c5c28;

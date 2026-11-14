@@ -7,6 +7,11 @@ export interface RunResult {
   elapsedMs: number;
   artifacts?: Record<string, string>;
 }
+export interface DownloadProgress {
+  phase: string;
+  loadedBytes: number;
+  totalBytes: number | null;
+}
 export interface Runtime {
   buildAndRun: (
     input: { files: Record<string, string>; rootClass: string; stdin?: string },
@@ -14,6 +19,7 @@ export interface Runtime {
       signal?: AbortSignal;
       onPhase?: (phase: string) => void;
       onOutput?: (text: string, fd: number) => void;
+      onProgress?: (progress: DownloadProgress) => void;
     },
   ) => Promise<RunResult>;
   getActiveWorkerCount: () => number;
