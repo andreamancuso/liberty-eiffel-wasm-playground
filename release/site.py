@@ -42,7 +42,7 @@ def package(source, dest, revision, run_id, run_url):
     if not report['passed'] or report['provenance']['playgroundRevision'] != revision:
         raise ValueError('Packaging requires a passing browser report for this revision')
     # A new destination avoids quietly retaining files from an older release.
-    shutil.copytree(source, dest, ignore=shutil.ignore_patterns('*-result.json', '*.png'))
+    shutil.copytree(source, dest, symlinks=True, ignore=shutil.ignore_patterns('*-result.json', '*.png'))
     (dest / '.nojekyll').touch()
     manifest = dict(schemaVersion=1, playgroundRevision=revision,
                     libertyRevision=report['provenance']['sourceRevision'],
