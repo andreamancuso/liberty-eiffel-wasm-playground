@@ -33,10 +33,10 @@ docker run --rm --platform linux/amd64 -p 127.0.0.1:8084:8000 `
 ```
 
 Open `http://localhost:8084`. Edit the source, optionally supply stdin text, and
-choose **Build & Run**. **Stop** cancels loading, compilation, linking or running.
-Program stdout and stderr are separate from build diagnostics. Generated C and
-headers remain inspectable and downloadable. The stage 2 compiler is available
-at `/stage2/`.
+choose **Run**. **Stop** cancels loading, compilation, linking or running.
+The page shows output and relevant Eiffel/program errors. Successful builds do
+not display backend warnings. Generated C and headers remain available in API
+results; the stage 2 compiler is available separately at `/stage2/`.
 
 No COOP/COEP headers, SharedArrayBuffer, or external CDN is required. This stage
 targets desktop Chromium. The standalone beta uses GitHub Pages with manual
@@ -134,6 +134,6 @@ to `artifacts/stage3/stage3-result.json` and `stage3-browser.png`.
 
 Acceptance also covers C and link failures, WASM traps, cancellation during all
 phases, an infinite loop, output flooding, missing/corrupt compiler assets,
-recovery, source editing, downloads and Stop. All ordinary requests must be
+recovery, source editing, visible Eiffel errors, quiet successful runs and Stop. All ordinary requests must be
 same-origin GETs. Compilation and execution have no network relay or endpoint.
 No compilation-speed cutoff is imposed.

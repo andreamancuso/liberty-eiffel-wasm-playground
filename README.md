@@ -2,8 +2,9 @@
 
 A browser-only Liberty Eiffel playground experiment for beyond-tabs.com. Stage 3
 compiles edited Eiffel to C, compiles and links that C to WebAssembly, and runs
-the program entirely in browser workers. It supports pre-supplied stdin,
-separate stdout/stderr, diagnostics, cancellation and generated-source downloads.
+the program entirely in browser workers. It supports program output, Eiffel
+errors, optional stdin, and cancellation. The page keeps
+build details and generated C out of the main interface.
 
 The playground owns the Docker recipes, asset packaging, worker API, interface,
 integration tests, and measurements. Liberty compiler/runtime changes belong in

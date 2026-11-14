@@ -13,7 +13,7 @@ await mkdir(output, { recursive: true });
 const report = { url:url.href, expectedRevision:revision, passed:false, requests:[], results:[] };
 const browser = await chromium.launch({ headless:true, args:['--no-sandbox'] });
 try {
-    const context = await browser.newContext({ acceptDownloads:true });
+    const context = await browser.newContext();
     const errors = [];
     context.on('request', request => {
         const target = new URL(request.url());
@@ -53,15 +53,16 @@ try {
     let result = await runUI('edited_source', hello(marker).files['hello.e']);
     assert.equal(result.status, 'success', result.diagnostics);
     assert.equal(result.stdout, marker+'\n');
-    await page.locator('#artifacts').selectOption('hello.c');
-    const [download] = await Promise.all([page.waitForEvent('download'), page.locator('#download').click()]);
-    assert.equal(download.suggestedFilename(), 'hello.c');
+    assert.equal(await page.locator('#errors').isVisible(), false);
+    assert.equal(await page.locator('#artifacts, #download, #generated, a[href="./stage2/"]').count(), 0);
     result = await runUI('utf8_stdin', 'class HELLO create {} make feature {} make do io.read_line; io.put_string(io.last_string); io.put_new_line end end', 'Żółw🙂\n');
     assert.equal(result.status, 'success', result.diagnostics);
     assert.equal(result.stdout, 'Żółw🙂\n');
     result = await runUI('compiler_diagnostic', 'class HELLO create {} make feature {} make do absent_feature end end');
     assert.equal(result.status, 'compiler_error');
     assert.ok(result.diagnostics.length > 0);
+    assert.equal(await page.locator('#errors').isVisible(), true);
+    assert.match(await page.locator('#diagnostics').textContent(), /absent_feature/);
     await page.locator('#source').fill('class HELLO create {} make feature {} make do from until False loop end end end');
     await page.evaluate(() => { window.stage3.lastResult = null; });
     await page.locator('#run').click();
@@ -73,6 +74,7 @@ try {
     result = await runUI('recovery', hello(marker+'_recovery').files['hello.e']);
     assert.equal(result.status, 'success', result.diagnostics);
     assert.equal(result.stdout, marker+'_recovery\n');
+    assert.equal(await page.locator('#errors').isVisible(), false);
     for (const response of report.requests) {
         if (response.url.endsWith('.mjs')) assert.match(response.headers['content-type'] ?? '', /javascript/);
         if (response.url.endsWith('/compiler.wasm')) assert.match(response.headers['content-type'] ?? '', /application\/wasm/);

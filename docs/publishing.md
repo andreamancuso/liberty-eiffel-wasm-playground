@@ -57,7 +57,7 @@ Only the deployment job gets Pages/OIDC write permissions; no long-lived
 deployment secret is needed.
 
 After deployment, Chromium tests the public HTTPS address with fresh edited
-source, UTF-8 stdin, compiler diagnostics, generated-source download, Stop, and
+source, UTF-8 stdin, visible Eiffel errors, quiet successful runs, Stop, and
 recovery. It checks the release revision, module/WASM delivery, and same-origin
 GET-only requests. The workflow summary links the site and reports timings;
 `hosted-<publishing-run-ID>` contains detailed results and a screenshot.

@@ -28,7 +28,7 @@ const siteUrl = origin + basePath;
 let browser;
 try {
     browser = await chromium.launch({ headless:true, args:['--no-sandbox'] });
-    const context = await browser.newContext({ acceptDownloads:true });
+    const context = await browser.newContext();
     context.on('request', req => { const url = new URL(req.url()); if (req.method() !== 'GET' || url.origin !== origin || !url.pathname.startsWith(basePath)) errors.push(`Unexpected request ${req.url()}`); });
     const page = await context.newPage();
     page.on('pageerror', error => errors.push(String(error)));
@@ -98,15 +98,22 @@ try {
     result=await run('recovery',hello(marker+'_recovery')); assert.equal(result.status,'success'); assert.equal(result.stdout,marker+'_recovery\n');
     await page.locator('#source').fill(hello(marker+'_ui').files['hello.e']); await page.locator('#run').click();
     await page.waitForFunction(()=>window.stage3.lastResult?.status==='success',null,{timeout:600000});
-    assert.equal(await page.locator('#stdout').textContent(),marker+'_ui\n'); await page.locator('#artifacts').selectOption('hello.c');
-    const [download]=await Promise.all([page.waitForEvent('download'),page.locator('#download').click()]); assert.equal(download.suggestedFilename(),'hello.c');
+    assert.equal(await page.locator('#stdout').textContent(),marker+'_ui\n');
+    assert.equal(await page.locator('#errors').isVisible(), false);
+    assert.equal(await page.locator('#artifacts, #download, #generated, a[href="./stage2/"]').count(), 0);
+    await page.locator('#source').fill('class HELLO create {} make feature {} make do absent_feature end end');
+    await page.locator('#run').click();
+    await page.waitForFunction(()=>window.stage3.lastResult?.status==='compiler_error',null,{timeout:600000});
+    assert.equal(await page.locator('#errors').isVisible(), true);
+    assert.match(await page.locator('#diagnostics').textContent(), /absent_feature/);
     await page.locator('#source').fill(loop.files['hello.e']); await page.locator('#run').click();
     await page.waitForFunction(()=>document.getElementById('status').textContent==='Running…',null,{timeout:600000});
     await page.locator('#stop').click(); await page.waitForFunction(()=>window.stage3.lastResult?.status==='cancelled');
     assert.equal(await page.evaluate(()=>window.stage3.getActiveWorkerCount()),0);
     await page.locator('#source').fill(hello(marker+'_final').files['hello.e']); await page.locator('#run').click();
     await page.waitForFunction(()=>window.stage3.lastResult?.stdout?.includes('_final'),null,{timeout:600000});
-    assert.equal(await page.evaluate(()=>window.stage3.lastResult.status),'success'); assert.deepEqual(errors,[]);
+    assert.equal(await page.evaluate(()=>window.stage3.lastResult.status),'success');
+    assert.equal(await page.locator('#errors').isVisible(), false); assert.deepEqual(errors,[]);
     // A fresh context prevents the opaque response cache masking HTTP decoding.
     encodedGzip = true;
     const encodedContext = await browser.newContext();
