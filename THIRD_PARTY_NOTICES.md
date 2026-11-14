@@ -21,5 +21,9 @@ It does not replace the licenses of the compiler, libraries, or build tools.
   Our ES-module export and filesystem injection adjustments are recorded in
   `stage3/patch-runtime.py`; I/O handling is supplied by `stage3/wasi.mjs`.
 
+The React/CodeMirror frontend uses pinned npm dependencies in `ui/package-lock.json`.
+Their license declarations and installed license notices are bundled under
+`licenses/ui/THIRD_PARTY_LICENSES.txt` in the generated site.
+
 Generated Eiffel C and headers retain Liberty's generated notices. The submodule
 retains the compiler and library sources and their original copyright headers.

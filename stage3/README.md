@@ -34,6 +34,13 @@ docker run --rm --platform linux/amd64 -p 127.0.0.1:8084:8000 `
 
 Open `http://localhost:8084`. Edit the source, optionally supply stdin text, and
 choose **Run**. **Stop** cancels loading, compilation, linking or running.
+Choose an example to explore its explanation and suggested edit, or use
+**My program** for your own project. File tabs preserve editing history; add,
+rename, and delete controls manage class files. **Run file** selects the entry
+class independently of the active editor tab. Ctrl/Cmd+Enter also runs the project;
+press Escape then Tab to leave the editor. Files and input are restored locally
+between visits; **Reset** restores the selected example after confirming edits.
+Links such as `#example=contracts` select an example directly.
 The page shows output and relevant Eiffel/program errors. Successful builds do
 not display backend warnings. Generated C and headers remain available in API
 results; the stage 2 compiler is available separately at `/stage2/`.
@@ -42,6 +49,24 @@ No COOP/COEP headers, SharedArrayBuffer, or external CDN is required. This stage
 targets desktop Chromium. The standalone beta uses GitHub Pages with manual
 releases; beyond-tabs.com links to it. See [publishing](../docs/publishing.md)
 for CI, release verification, and rollback. Generated artifacts are ignored by Git.
+
+## Frontend development
+
+The `ui/` package contains React, TypeScript, Vite, and CodeMirror 6, with the
+Eiffel stream mode from `@codemirror/legacy-modes` (upstream:
+<https://code.haverbeke.berlin/codemirror/legacy-modes>). Docker packages a local
+bundle and dependency licenses alongside the existing runtime modules. The
+compiler API and worker assets remain separate from the frontend bundle.
+
+After building stage 3, serve `artifacts/stage3` on port 8084 (as above), then run
+`npm ci` and `npm run dev` in `ui/`. Vite proxies runtime asset requests to that
+static server. `npm test` checks workspace integrity, local storage fallback,
+and diagnostic navigation; `npm run build` type-checks and bundles the UI.
+Browser acceptance runs every example and verifies deliberate contract failures,
+project editing, saved drafts, keyboard controls, and storage-unavailable mode.
+
+SQLite is a separate feasibility task. There is no database example or browser
+persistence for databases in this release.
 
 ## API and lifetime
 

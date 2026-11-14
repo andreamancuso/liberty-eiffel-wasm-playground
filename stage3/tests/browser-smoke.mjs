@@ -4,12 +4,13 @@ import { createServer } from 'node:http';
 import path from 'node:path';
 import { chromium } from 'playwright';
 import { hello, multi, invalid } from './stage2-fixtures.mjs';
+import { setSource, checkLearningUI, checkUnavailableStorage } from './ui-checks.mjs';
 const root = '/artifacts', requests = [], errors = [], results = [];
 const basePath = process.env.SITE_BASE_PATH ?? '/liberty-eiffel-wasm-playground/';
 assert.match(basePath, /^\/(?:[a-zA-Z0-9_-]+\/)*$/);
 let encodedGzip = false;
 await rm(`${root}/stage3-result.json`, { force: true });
-const types = { '.html':'text/html', '.mjs':'text/javascript', '.wasm':'application/wasm', '.json':'application/json' };
+const types = { '.html':'text/html', '.mjs':'text/javascript', '.js':'text/javascript', '.css':'text/css', '.wasm':'application/wasm', '.json':'application/json' };
 const server = createServer(async (req, res) => {
     try {
         const pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
@@ -45,6 +46,11 @@ try {
         record(name, result); assert.equal(await page.evaluate(() => window.stage3.getActiveWorkerCount()),0); return result;
     };
     const marker = `Stage3_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+    const catalogue = await (await page.request.get(siteUrl + 'examples.json')).json();
+    for (const example of catalogue) {
+        const result = await run('example_' + example.id, example);
+        assert.equal(result.status, 'success', result.diagnostics); assert.equal(result.stdout, example.expectedOutput);
+    }
     let result = await run('cold_hello', hello(marker));
     assert.equal(result.status,'success',result.diagnostics + result.error); assert.equal(result.stdout,marker+'\n'); assert.equal(result.stderr,'');
     result = await run('warm_hello',hello(marker+'_warm')); assert.equal(result.status,'success',result.diagnostics); assert.equal(result.stdout,marker+'_warm\n');
@@ -96,24 +102,28 @@ try {
         } finally {await broken.close();}
     }
     result=await run('recovery',hello(marker+'_recovery')); assert.equal(result.status,'success'); assert.equal(result.stdout,marker+'_recovery\n');
-    await page.locator('#source').fill(hello(marker+'_ui').files['hello.e']); await page.locator('#run').click();
+    await setSource(page,hello(marker+'_ui').files['hello.e'].replace('class HELLO','class MAIN')); await page.locator('#run').click();
     await page.waitForFunction(()=>window.stage3.lastResult?.status==='success',null,{timeout:600000});
     assert.equal(await page.locator('#stdout').textContent(),marker+'_ui\n');
     assert.equal(await page.locator('#errors').isVisible(), false);
     assert.equal(await page.locator('#artifacts, #download, #generated, a[href="./stage2/"]').count(), 0);
-    await page.locator('#source').fill('class HELLO create {} make feature {} make do absent_feature end end');
+    await setSource(page,'class MAIN create {} make feature {} make do absent_feature end end');
     await page.locator('#run').click();
     await page.waitForFunction(()=>window.stage3.lastResult?.status==='compiler_error',null,{timeout:600000});
     assert.equal(await page.locator('#errors').isVisible(), true);
     assert.match(await page.locator('#diagnostics').textContent(), /absent_feature/);
-    await page.locator('#source').fill(loop.files['hello.e']); await page.locator('#run').click();
+    await setSource(page,loop.files['hello.e'].replace('class HELLO','class MAIN')); await page.locator('#run').click();
     await page.waitForFunction(()=>document.getElementById('status').textContent==='Running…',null,{timeout:600000});
+    assert.equal(await page.locator('.cm-content').getAttribute('contenteditable'), 'false');
     await page.locator('#stop').click(); await page.waitForFunction(()=>window.stage3.lastResult?.status==='cancelled');
     assert.equal(await page.evaluate(()=>window.stage3.getActiveWorkerCount()),0);
-    await page.locator('#source').fill(hello(marker+'_final').files['hello.e']); await page.locator('#run').click();
+    await setSource(page,hello(marker+'_final').files['hello.e'].replace('class HELLO','class MAIN')); await page.locator('#run').click();
     await page.waitForFunction(()=>window.stage3.lastResult?.stdout?.includes('_final'),null,{timeout:600000});
     assert.equal(await page.evaluate(()=>window.stage3.lastResult.status),'success');
     assert.equal(await page.locator('#errors').isVisible(), false); assert.deepEqual(errors,[]);
+    results.push(await checkLearningUI(page, siteUrl, { full:true }));
+    await checkUnavailableStorage(browser, siteUrl);
+    assert.deepEqual(errors, []);
     // A fresh context prevents the opaque response cache masking HTTP decoding.
     encodedGzip = true;
     const encodedContext = await browser.newContext();

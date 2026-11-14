@@ -62,6 +62,11 @@ recovery. It checks the release revision, module/WASM delivery, and same-origin
 GET-only requests. The workflow summary links the site and reports timings;
 `hosted-<publishing-run-ID>` contains detailed results and a screenshot.
 
+The learning workspace checks also cover contract failure navigation, class-file
+operations, local draft restoration, Reset, and keyboard Run. The full offline
+suite runs all example programs and verifies preconditions, postconditions with
+`old`, invariants, and operation when local storage is unavailable.
+
 A failed hosted check marks the workflow failed **after publication**, so that
 site remains live until another deployment. Inspect its diagnostics before
 linking or announcing the beta.

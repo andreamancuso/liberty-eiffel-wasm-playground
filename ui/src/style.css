@@ -1,0 +1,485 @@
+:root {
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  color: #26352b;
+  background: #f4f5ef;
+  font-synthesis: none;
+  line-height: 1.55;
+  font-size: 15px;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+button,
+select {
+  cursor: pointer;
+}
+button {
+  border: 1px solid #cbd2c7;
+  background: #fff;
+  border-radius: 6px;
+  padding: 0.45rem 0.8rem;
+  color: inherit;
+}
+button:hover:not(:disabled) {
+  background: #edf1e8;
+  border-color: #8d9e8a;
+}
+button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+button:focus-visible,
+a:focus-visible,
+select:focus-visible,
+summary:focus-visible {
+  outline: 2px solid #35634b;
+  outline-offset: 3px;
+}
+select,
+input {
+  border: 1px solid #cbd2c7;
+  background: white;
+  color: inherit;
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+}
+a {
+  color: #35634b;
+}
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+.page-header,
+main,
+footer {
+  max-width: 1380px;
+  margin: auto;
+  padding-left: clamp(1rem, 4vw, 3.5rem);
+  padding-right: clamp(1rem, 4vw, 3.5rem);
+}
+.page-header {
+  padding-top: 2.3rem;
+  padding-bottom: 1.6rem;
+}
+.eyebrow {
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: #60745d;
+  margin-bottom: 0.45rem;
+}
+h1 {
+  font-size: clamp(1.6rem, 3vw, 2.15rem);
+  letter-spacing: -0.035em;
+  line-height: 1.2;
+  margin-bottom: 0.55rem;
+  font-weight: 650;
+}
+.subtitle {
+  color: #64705f;
+  margin: 0;
+}
+.example-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+}
+.example-bar label {
+  font-weight: 650;
+}
+.example-bar select {
+  min-width: 210px;
+}
+.text-button {
+  background: transparent;
+  border-color: transparent;
+  color: #52664f;
+  font-size: 0.85rem;
+  margin-left: auto;
+}
+.playground {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  gap: clamp(1.5rem, 4vw, 3.2rem);
+  align-items: start;
+}
+.without-notes {
+  grid-template-columns: minmax(0, 1fr);
+}
+aside {
+  padding-top: 0.5rem;
+}
+aside h2 {
+  font-size: 1.55rem;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+  margin-bottom: 1rem;
+}
+aside h3 {
+  font-size: 0.82rem;
+  font-weight: 750;
+  margin-bottom: 0.4rem;
+}
+aside p {
+  font-size: 0.94rem;
+  color: #52604f;
+  margin-bottom: 1.3rem;
+}
+.section-kicker {
+  display: block;
+  font-size: 0.72rem;
+  color: #697865;
+  margin-bottom: 0.45rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.try-this {
+  border-left: 3px solid #8fa47c;
+  padding: 0.15rem 0 0.15rem 1rem;
+  margin: 1.4rem 0;
+}
+.try-this h3 {
+  color: #35634b;
+}
+.try-this p {
+  margin-bottom: 0;
+}
+.hints {
+  font-size: 0.87rem;
+  color: #52604f;
+}
+.hints p {
+  font-size: inherit;
+  margin-top: 0.8rem;
+}
+.hints summary {
+  cursor: pointer;
+}
+.workspace {
+  min-width: 0;
+  background: #fff;
+  border: 1px solid #d5dbd0;
+  border-radius: 10px;
+  box-shadow: 0 4px 18px #27352505;
+  overflow: hidden;
+}
+.file-toolbar {
+  display: flex;
+  align-items: center;
+  background: #ebefe6;
+  padding: 0.4rem 0.6rem 0.1rem;
+  gap: 0.6rem;
+  border-bottom: 1px solid #d5dbd0;
+}
+.file-tabs {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  gap: 0.15rem;
+}
+.file-tabs button {
+  border: none;
+  background: transparent;
+  border-radius: 5px 5px 0 0;
+  white-space: nowrap;
+  font:
+    12px ui-monospace,
+    monospace;
+  padding: 0.65rem 0.7rem;
+  color: #64705f;
+}
+.file-tabs [aria-selected="true"] {
+  background: white;
+  color: #26352b;
+  box-shadow: 0 -2px #4d7351 inset;
+}
+.entry-marker {
+  color: #78946d;
+  font-size: 0.6rem;
+}
+.compact {
+  font-size: 0.8rem;
+  white-space: nowrap;
+  padding: 0.3rem 0.5rem;
+  margin-bottom: 0.3rem;
+}
+.file-actions {
+  display: flex;
+  gap: 0.7rem;
+  align-items: center;
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid #e7eae3;
+  color: #6d7869;
+  font-size: 0.75rem;
+  min-height: 39px;
+}
+.file-actions > span {
+  font-family: ui-monospace, monospace;
+  margin-right: 0.1rem;
+}
+.file-actions > button {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-size: inherit;
+  color: #60745d;
+}
+.run-file {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+.run-file select {
+  font-size: 0.75rem;
+  padding: 0.12rem 0.3rem;
+  max-width: 150px;
+}
+.editor {
+  background: white;
+  max-height: 580px;
+  overflow: auto;
+}
+.editor-help {
+  font-size: 0.7rem;
+  color: #798272;
+  padding: 0.4rem 1rem;
+  margin: 0;
+  border-top: 1px solid #edf0e9;
+}
+.input-label {
+  display: block;
+  padding: 0.55rem 1rem 0.3rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.muted {
+  color: #798272;
+  font-weight: 400;
+}
+.input-label .muted {
+  margin-left: 0.25rem;
+  font-size: 0.75rem;
+}
+#stdin {
+  display: block;
+  width: calc(100% - 2rem);
+  margin: 0 1rem 0.8rem;
+  padding: 0.5rem 0.65rem;
+  min-height: 62px;
+  resize: vertical;
+  border: 1px solid #d9dfd3;
+  border-radius: 5px;
+  font:
+    13px/1.5 ui-monospace,
+    monospace;
+  background: #fcfcfa;
+  color: inherit;
+}
+.run-toolbar {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  padding: 0.2rem 1rem 1rem;
+  flex-wrap: wrap;
+}
+.primary {
+  background: #345b43;
+  color: white;
+  border-color: #345b43;
+  font-weight: 600;
+}
+.primary:hover:not(:disabled) {
+  background: #274c36;
+  color: white;
+  border-color: #274c36;
+}
+#run span {
+  font-size: 0.65rem;
+  margin-left: 0.8rem;
+}
+.reset {
+  background: transparent;
+  border-color: transparent;
+  font-size: 0.82rem;
+}
+#status {
+  margin: 0 0 0 auto;
+  color: #71806b;
+  font-size: 0.75rem;
+}
+.output {
+  border-top: 1px solid #dce2d6;
+  background: #fafbf7;
+  padding: 1rem;
+}
+.output h2,
+.errors h2 {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.7rem;
+  color: #62715b;
+}
+pre {
+  font:
+    13px/1.6 ui-monospace,
+    SFMono-Regular,
+    Consolas,
+    monospace;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin: 0;
+  max-height: 340px;
+  overflow: auto;
+}
+#stdout {
+  min-height: 2rem;
+}
+.errors {
+  border-top: 1px solid #e7c9bf;
+  background: #fff9f6;
+  padding: 1rem;
+  color: #713d30;
+}
+.errors h2 {
+  color: #8b4939;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.95rem;
+}
+.errors summary {
+  cursor: pointer;
+  font-size: 0.85rem;
+  margin-bottom: 0.6rem;
+}
+.source-links {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.source-links button {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font:
+    12px ui-monospace,
+    monospace;
+  text-decoration: underline;
+  color: #894b37;
+  margin-bottom: 0.7rem;
+}
+.saving-notice {
+  font-size: 0.85rem;
+  color: #7c5c28;
+}
+footer {
+  display: flex;
+  gap: 0.65rem;
+  padding-top: 1.8rem;
+  padding-bottom: 2rem;
+  font-size: 0.8rem;
+  color: #7b8574;
+}
+footer a {
+  color: inherit;
+}
+dialog {
+  border: 1px solid #cbd2c7;
+  border-radius: 10px;
+  padding: 1.7rem;
+  color: inherit;
+  max-width: min(480px, calc(100% - 2rem));
+  box-shadow: 0 20px 80px #14251830;
+}
+dialog::backdrop {
+  background: #1c2d2355;
+}
+dialog h2 {
+  font-size: 1.2rem;
+}
+dialog label {
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 0.4rem;
+}
+dialog input {
+  width: 100%;
+}
+dialog .muted {
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+}
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.7rem;
+  margin-top: 1.4rem;
+}
+.form-error {
+  color: #934936;
+  font-size: 0.85rem;
+}
+@media (max-width: 800px) {
+  .playground {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.1rem;
+  }
+  aside p {
+    margin-bottom: 0.8rem;
+  }
+  aside h2 {
+    margin-bottom: 0.6rem;
+  }
+  .try-this {
+    margin: 0.8rem 0;
+  }
+  .page-header {
+    padding-top: 1.4rem;
+  }
+  .example-bar {
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  .example-bar select {
+    min-width: 0;
+    flex: 1;
+  }
+  .example-bar .text-button {
+    margin-left: 0;
+  }
+  .file-actions {
+    gap: 0.55rem;
+    flex-wrap: wrap;
+  }
+  .run-file {
+    margin-left: auto;
+  }
+  .run-toolbar #status {
+    width: 100%;
+    margin-left: 0;
+  }
+  .editor .cm-content {
+    min-height: 260px;
+  }
+}

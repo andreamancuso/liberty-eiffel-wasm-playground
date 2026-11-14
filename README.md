@@ -6,6 +6,11 @@ the program entirely in browser workers. It supports program output, Eiffel
 errors, optional stdin, and cancellation. The page keeps
 build details and generated C out of the main interface.
 
+Explore seven editable examples, including contracts, inheritance, and generics,
+or start in **My program**. The React/TypeScript interface uses CodeMirror for
+Eiffel editing, supports multiple class files, and saves drafts in this browser.
+Each example has a brief explanation and a suggested experiment.
+
 The playground owns the Docker recipes, asset packaging, worker API, interface,
 integration tests, and measurements. Liberty compiler/runtime changes belong in
 the [Liberty fork](https://github.com/andreamancuso/Liberty), included here as the

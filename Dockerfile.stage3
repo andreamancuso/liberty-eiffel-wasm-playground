@@ -1,9 +1,16 @@
 ARG TOOLCHAIN_IMAGE=liberty-emscripten:stage3-toolchain
+FROM node:24.20.0-bookworm-slim@sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e AS frontend
+WORKDIR /ui
+COPY ui/package.json ui/package-lock.json ./
+RUN npm ci --no-audit --no-fund
+COPY ui/ ./
+RUN npm test && npm run build
+
 FROM ${TOOLCHAIN_IMAGE} AS site
 COPY --from=stage2_output /compiler.mjs /compiler.wasm /compiler.data /runtime.mjs /client.mjs /worker.mjs /provenance.json /out/stage2/
 COPY --from=stage2_output /licenses/ /out/licenses/liberty/
 COPY stage2/web/ /out/stage2/
 COPY stage3/client.mjs stage3/worker.mjs stage3/wasi.mjs /out/
-COPY stage3/web/ /out/
+COPY --from=frontend /ui/dist/ /out/
 FROM scratch AS artifacts
 COPY --from=site /out/ /

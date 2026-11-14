@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { chromium } from 'playwright';
 import { hello } from './stage2-fixtures.mjs';
+import { setSource, checkLearningUI } from './ui-checks.mjs';
 
 const url = new URL(process.argv[2]);
 assert.equal(url.protocol, 'https:');
@@ -36,7 +37,7 @@ try {
     report.release = manifest;
     const marker = `Hosted_${Date.now()}`;
     const runUI = async (name, source, stdin = '') => {
-        await page.locator('#source').fill(source);
+        await setSource(page,source.replace('class HELLO','class MAIN'));
         await page.locator('#stdin').fill(stdin);
         await page.evaluate(() => { window.stage3.lastResult = null; });
         await page.locator('#run').click();
@@ -63,7 +64,7 @@ try {
     assert.ok(result.diagnostics.length > 0);
     assert.equal(await page.locator('#errors').isVisible(), true);
     assert.match(await page.locator('#diagnostics').textContent(), /absent_feature/);
-    await page.locator('#source').fill('class HELLO create {} make feature {} make do from until False loop end end end');
+    await setSource(page,'class MAIN create {} make feature {} make do from until False loop end end end');
     await page.evaluate(() => { window.stage3.lastResult = null; });
     await page.locator('#run').click();
     await page.waitForFunction(() => document.getElementById('status').textContent === 'Running…', null, {timeout:600000});
@@ -75,6 +76,7 @@ try {
     assert.equal(result.status, 'success', result.diagnostics);
     assert.equal(result.stdout, marker+'_recovery\n');
     assert.equal(await page.locator('#errors').isVisible(), false);
+    report.results.push(await checkLearningUI(page, url.href));
     for (const response of report.requests) {
         if (response.url.endsWith('.mjs')) assert.match(response.headers['content-type'] ?? '', /javascript/);
         if (response.url.endsWith('/compiler.wasm')) assert.match(response.headers['content-type'] ?? '', /application\/wasm/);
