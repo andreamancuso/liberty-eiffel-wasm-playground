@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Liberty Eiffel — browser compiler</title>
+<style>
+body{font:16px system-ui;margin:2rem auto;padding:0 1rem;max-width:1000px;color:#20242a;background:#f7f8fa}textarea,pre{font:14px ui-monospace,monospace;box-sizing:border-box;width:100%;padding:1rem;background:white;border:1px solid #bbc3cc;border-radius:4px}textarea{height:260px}pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:420px;overflow:auto}button,input,select{font:inherit;padding:.4rem;margin:.3rem 0}label{display:block}#status{min-height:1.5em}button{cursor:pointer}
+</style>
+<h1>Liberty Eiffel browser compiler</h1>
+<p>Translate Eiffel to C entirely in your browser. This experiment produces source files; program execution is a later step.</p>
+<label>Source filename <input id="filename" value="hello.e" spellcheck="false"></label>
+<label for="source">Eiffel source</label>
+<textarea id="source" spellcheck="false">class HELLO
+create {}
+   make
+feature {}
+   make
+      do
+         io.put_string("Hello from the browser compiler!%N")
+      end
+end
+</textarea>
+<button id="translate">Translate to C</button> <button id="cancel" disabled>Cancel</button>
+<p id="status" role="status">Ready.</p>
+<h2>Compiler diagnostics</h2><pre id="diagnostics">No compilation yet.</pre>
+<h2>Generated files</h2>
+<select id="artifacts" aria-label="Generated file" disabled></select>
+<button id="download" disabled>Download selected file</button>
+<pre id="generated">Generated C and headers will appear here.</pre>
+<script type="module">
+import { compile, getActiveWorkerCount } from './client.mjs';
+window.stage2 = { compile, getActiveWorkerCount };
+const byId = id => document.getElementById(id);
+let controller, artifacts = {};
+const showArtifact = () => { byId('generated').textContent = artifacts[byId('artifacts').value] ?? ''; };
+byId('artifacts').onchange = showArtifact;
+byId('cancel').onclick = () => controller?.abort();
+byId('translate').onclick = async () => {
+    controller = new AbortController();
+    artifacts = {};
+    byId('artifacts').replaceChildren();
+    byId('artifacts').disabled = byId('download').disabled = true;
+    byId('generated').textContent = '';
+    byId('diagnostics').textContent = '';
+    byId('translate').disabled = true;
+    byId('cancel').disabled = false;
+    const filename = byId('filename').value;
+    const result = await compile({ files: { [filename]: byId('source').value }, rootClass: filename }, {
+        signal: controller.signal,
+        onPhase: phase => { byId('status').textContent = phase === 'loading' ? 'Loading compiler and library…' : 'Translating Eiffel…'; },
+    });
+    byId('status').textContent = `${result.status} · ${(result.elapsedMs / 1000).toFixed(2)} s`;
+    byId('diagnostics').textContent = [...result.stdout, ...result.stderr].join('\n') || 'No diagnostics.';
+    artifacts = result.artifacts;
+    for (const name of Object.keys(artifacts).sort()) byId('artifacts').add(new Option(name, name));
+    byId('artifacts').disabled = byId('download').disabled = !Object.keys(artifacts).length;
+    showArtifact();
+    byId('translate').disabled = false;
+    byId('cancel').disabled = true;
+};
+byId('download').onclick = () => {
+    const name = byId('artifacts').value;
+    const url = URL.createObjectURL(new Blob([artifacts[name]], { type: 'text/plain;charset=utf-8' }));
+    const link = document.createElement('a'); link.href = url; link.download = name; link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
+</script>
+</html>

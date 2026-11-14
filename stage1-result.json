@@ -1,0 +1,66 @@
+{
+  "passed": true,
+  "date": "2026-11-14T08:46:30.988Z",
+  "sourceRevision": "21b081378ec12798080128e7f39878d5d2097cb7",
+  "emscriptenVersion": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 7.0.0 (777e6e5db7b4990bcaeb1b9998ed642cc84e6629)",
+  "browser": "141.0.7390.37",
+  "wasmBytes": {
+    "hello": 193124,
+    "contract_failure": 138312
+  },
+  "requests": [
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:33451/"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:33451/hello.mjs"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:33451/contract_failure.mjs"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:33451/hello.wasm"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:33451/contract_failure.wasm"
+    }
+  ],
+  "status": "complete",
+  "results": [
+    {
+      "name": "hello",
+      "exitCode": 0,
+      "stdout": [
+        "Hello from Liberty Eiffel and WebAssembly!",
+        "42"
+      ],
+      "stderr": []
+    },
+    {
+      "name": "contract_failure",
+      "exitCode": 1,
+      "stdout": [],
+      "stderr": [
+        "*** Error at Run Time ***: Check Assertion Violated.",
+        "*** Error at Run Time ***: expected_failure",
+        "2 frames in run-time stack.",
+        "====  Bottom of run-time stack  ====",
+        "<system root>",
+        "Current = CONTRACT_FAILURE#0x1ac38",
+        "line 7 column 4 file /generated/contract_failure.e ",
+        "======================================",
+        "make CONTRACT_FAILURE",
+        "Current = CONTRACT_FAILURE#0x1ac38",
+        "line 10 column 31 file /generated/contract_failure.e ",
+        "====  Top of run-time stack   ====",
+        "*** Error at Run Time ***: Check Assertion Violated.",
+        "*** Error at Run Time ***: expected_failure"
+      ]
+    }
+  ]
+}

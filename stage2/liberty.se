@@ -1,0 +1,27 @@
+[General]
+bin: /liberty/bin
+sys: /liberty/sys
+short: /liberty/resources/short
+os: UNIX
+flavor: Linux
+tag: 3
+jobs: 1
+
+[Environment]
+path_liberty: /liberty/
+path_liberty_core: /liberty/src/lib/
+
+[Loadpath]
+liberty_core: ${path_liberty_core}loadpath.se
+
+[all_check]
+c_compiler_type: gcc
+c_compiler_path: gcc
+c_compiler_options: -O0
+c_linker_path: gcc
+c_linker_options:
+cpp_compiler_type: g++
+cpp_compiler_path: g++
+cpp_compiler_options: -O0
+cpp_linker_path: gcc
+cpp_linker_options:

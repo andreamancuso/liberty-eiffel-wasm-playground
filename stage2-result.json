@@ -1,0 +1,599 @@
+{
+  "translation": {
+    "passed": true,
+    "date": "2026-11-14T09:35:41.847Z",
+    "browser": "141.0.7390.37",
+    "sdk": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 7.0.0 (777e6e5db7b4990bcaeb1b9998ed642cc84e6629)",
+    "provenance": {
+      "sourceRevision": "21b081378ec12798080128e7f39878d5d2097cb7",
+      "sourceDiffSha256": "7aa6bf5412cf99da62cb7eabfd653425fcc561eed0bd46bb81ed37262ad6294d",
+      "bootstrapImage": "sha256:fd33114558fee3b99a8727c9c5360c04ecf127e7ec5eb873c12f3d4bbd91259f",
+      "flags": "Liberty -boost -no_gc -split legacy; emcc -O2; stack 16 MiB; initial 64 MiB; max 1 GiB"
+    },
+    "assetBytes": {
+      "compiler.mjs": 209503,
+      "compiler.wasm": 4554337,
+      "compiler.data": 5278826
+    },
+    "results": [
+      {
+        "name": "cold_hello",
+        "status": "success",
+        "exitCode": 0,
+        "stdout": [],
+        "stderr": [],
+        "compilationMs": 2765.899999999441,
+        "linearMemoryBytes": 167051264,
+        "initializationMs": 258.90000000037253,
+        "resources": [
+          {
+            "name": "http://127.0.0.1:43071/runtime.mjs",
+            "transferSize": 3616,
+            "encodedBodySize": 3316,
+            "decodedBodySize": 3316,
+            "durationMs": 9.300000000745058
+          },
+          {
+            "name": "http://127.0.0.1:43071/compiler.mjs",
+            "transferSize": 209803,
+            "encodedBodySize": 209503,
+            "decodedBodySize": 209503,
+            "durationMs": 10.299999999813735
+          },
+          {
+            "name": "http://127.0.0.1:43071/compiler.data",
+            "transferSize": 5279126,
+            "encodedBodySize": 5278826,
+            "decodedBodySize": 5278826,
+            "durationMs": 91.09999999962747
+          },
+          {
+            "name": "http://127.0.0.1:43071/compiler.wasm",
+            "transferSize": 4554637,
+            "encodedBodySize": 4554337,
+            "decodedBodySize": 4554337,
+            "durationMs": 79.79999999981374
+          }
+        ],
+        "elapsedMs": 3076.9000000003725,
+        "artifactNames": [
+          "hello.c",
+          "hello.h",
+          "hello.make",
+          "hello.id"
+        ]
+      },
+      {
+        "name": "syntax",
+        "status": "compiler_error",
+        "exitCode": 1,
+        "stdout": [],
+        "stderr": [
+          "****** Fatal Error: ')' expected to end arguments list.",
+          "",
+          "Line 1 column 62 in HELLO (/work/hello.e):",
+          "------"
+        ],
+        "compilationMs": 167.29999999981374,
+        "linearMemoryBytes": 67108864,
+        "initializationMs": 113.90000000037253,
+        "resources": [
+          {
+            "name": "http://127.0.0.1:43071/runtime.mjs",
+            "transferSize": 0,
+            "encodedBodySize": 3316,
+            "decodedBodySize": 3316,
+            "durationMs": 4.599999999627471
+          },
+          {
+            "name": "http://127.0.0.1:43071/compiler.mjs",
+            "transferSize": 0,
+            "encodedBodySize": 209503,
+            "decodedBodySize": 209503,
+            "durationMs": 4.2999999998137355
+          },
+          {
+            "name": "http://127.0.0.1:43071/compiler.data",
+            "transferSize": 0,
+            "encodedBodySize": 5278826,
+            "decodedBodySize": 5278826,
+            "durationMs": 12.099999999627471
+          },
+          {
+            "name": "http://127.0.0.1:43071/compiler.wasm",
+            "transferSize": 0,
+            "encodedBodySize": 4554337,
+            "decodedBodySize": 4554337,
+            "durationMs": 16.199999999254942
+          }
+        ],
+        "elapsedMs": 317.90000000037253,
+        "artifactNames": []
+      },
+      {
+        "name": "type",
+        "status": "compiler_error",
+        "exitCode": 1,
+        "stdout": [],
+        "stderr": [
+          "****** Fatal Error: Assignment of a reference type into an expanded type is not allowed. Cannot assign `\"wrong\"' which is of type STRING into `i' which is of type INTEGER_32.",
+          "",
+          "The source lines relevant to this message are the following:",
+          "",
+          "Line 1 columns 64, 69 in HELLO (/work/hello.e):",
+          "------"
+        ],
+        "compilationMs": 1686.9000000003725,
+        "linearMemoryBytes": 139198464,
+        "initializationMs": 149.70000000018626,
+        "resources": [
+          {
+            "name": "http://127.0.0.1:43071/runtime.mjs",
+            "transferSize": 0,
+            "encodedBodySize": 3316,
+            "decodedBodySize": 3316,
+            "durationMs": 4.2999999998137355
+          },
+          {
+            "name": "http://127.0.0.1:43071/compiler.mjs",
+            "transferSize": 0,
+            "encodedBodySize": 209503,
+            "decodedBodySize": 209503,
+            "durationMs": 3.2999999998137355
+          },
+          {
+            "name": "http://127.0.0.1:43071/compiler.data",
+            "transferSize": 0,
+            "encodedBodySize": 5278826,
+            "decodedBodySize": 5278826,
+            "durationMs": 11.299999999813735
+          },
+          {
+            "name": "http://127.0.0.1:43071/compiler.wasm",
+            "transferSize": 0,
+            "encodedBodySize": 4554337,
+            "decodedBodySize": 4554337,
+            "durationMs": 19.90000000037253
+          }
+        ],
+        "elapsedMs": 1873.5999999996275,
+        "artifactNames": []
+      },
+      {
+        "name": "missing_class",
+        "status": "compiler_error",
+        "exitCode": 1,
+        "stdout": [],
+        "stderr": [
+          "****** Fatal Error: Cannot find the class \"MISSING_HELPER\" in any known cluster.",
+          "",
+          "Line 1 column 53 in HELLO (/work/hello.e):",
+          "------"
+        ],
+        "compilationMs": 278.29999999981374,
+        "linearMemoryBytes": 67108864,
+        "initializationMs": 100.40000000037253,
+        "resources": [
+          {
+            "name": "http://127.0.0.1:43071/runtime.mjs",
+            "transferSize": 0,
+            "encodedBodySize": 3316,
+            "decodedBodySize": 3316,
+            "durationMs": 2.7000000001862645
+          },
+          {
+            "name": "http://127.0.0.1:43071/compiler.mjs",
+            "transferSize": 0,
+            "encodedBodySize": 209503,
+            "decodedBodySize": 209503,
+            "durationMs": 2.699999999254942
+          },
+          {
+            "name": "http://127.0.0.1:43071/compiler.data",
+            "transferSize": 0,
+            "encodedBodySize": 5278826,
+            "decodedBodySize": 5278826,
+            "durationMs": 9.700000000186265
+          },
+          {
+            "name": "http://127.0.0.1:43071/compiler.wasm",
+            "transferSize": 0,
+            "encodedBodySize": 4554337,
+            "decodedBodySize": 4554337,
+            "durationMs": 14.100000000558794
+          }
+        ],
+        "elapsedMs": 416.3999999994412,
+        "artifactNames": []
+      },
+      {
+        "name": "warm_hello_after_errors",
+        "status": "success",
+        "exitCode": 0,
+        "stdout": [],
+        "stderr": [],
+        "compilationMs": 2648.9000000003725,
+        "linearMemoryBytes": 167051264,
+        "initializationMs": 149.19999999925494,
+        "resources": [
+          {
+            "name": "http://127.0.0.1:43071/runtime.mjs",
+            "transferSize": 0,
+            "encodedBodySize": 3316,
+            "decodedBodySize": 3316,
+            "durationMs": 3.199999999254942
+          },
+          {
+            "name": "http://127.0.0.1:43071/compiler.mjs",
+            "transferSize": 0,
+            "encodedBodySize": 209503,
+            "decodedBodySize": 209503,
+            "durationMs": 3.7000000001862645
+          },
+          {
+            "name": "http://127.0.0.1:43071/compiler.data",
+            "transferSize": 0,
+            "encodedBodySize": 5278826,
+            "decodedBodySize": 5278826,
+            "durationMs": 11.200000000186265
+          },
+          {
+            "name": "http://127.0.0.1:43071/compiler.wasm",
+            "transferSize": 0,
+            "encodedBodySize": 4554337,
+            "decodedBodySize": 4554337,
+            "durationMs": 17.700000000186265
+          }
+        ],
+        "elapsedMs": 2826.7999999998137,
+        "artifactNames": [
+          "hello.c",
+          "hello.h",
+          "hello.make",
+          "hello.id"
+        ]
+      },
+      {
+        "name": "inheritance_and_generics",
+        "status": "success",
+        "exitCode": 0,
+        "stdout": [],
+        "stderr": [],
+        "compilationMs": 2757.300000000745,
+        "linearMemoryBytes": 167051264,
+        "initializationMs": 105.5,
+        "resources": [
+          {
+            "name": "http://127.0.0.1:43071/runtime.mjs",
+            "transferSize": 0,
+            "encodedBodySize": 3316,
+            "decodedBodySize": 3316,
+            "durationMs": 3.1000000005587935
+          },
+          {
+            "name": "http://127.0.0.1:43071/compiler.mjs",
+            "transferSize": 0,
+            "encodedBodySize": 209503,
+            "decodedBodySize": 209503,
+            "durationMs": 3.2999999998137355
+          },
+          {
+            "name": "http://127.0.0.1:43071/compiler.data",
+            "transferSize": 0,
+            "encodedBodySize": 5278826,
+            "decodedBodySize": 5278826,
+            "durationMs": 11.600000000558794
+          },
+          {
+            "name": "http://127.0.0.1:43071/compiler.wasm",
+            "transferSize": 0,
+            "encodedBodySize": 4554337,
+            "decodedBodySize": 4554337,
+            "durationMs": 14.599999999627471
+          }
+        ],
+        "elapsedMs": 2915.9000000003725,
+        "artifactNames": [
+          "hello.c",
+          "hello.h",
+          "hello.make",
+          "hello.id"
+        ]
+      },
+      {
+        "name": "cancel_loading",
+        "status": "cancelled",
+        "exitCode": null,
+        "stdout": [],
+        "stderr": [
+          "Compilation cancelled."
+        ],
+        "artifacts": {},
+        "elapsedMs": 9.199999999254942
+      },
+      {
+        "name": "cancel_compiling",
+        "status": "cancelled",
+        "exitCode": null,
+        "stdout": [],
+        "stderr": [
+          "Compilation cancelled."
+        ],
+        "artifacts": {},
+        "elapsedMs": 123.6000000005588
+      },
+      {
+        "name": "timeout",
+        "status": "timed_out",
+        "exitCode": null,
+        "stdout": [],
+        "stderr": [
+          "Compiler deadline exceeded."
+        ],
+        "artifacts": {},
+        "elapsedMs": 1.5
+      },
+      {
+        "name": "invalid_path",
+        "status": "invalid_input",
+        "exitCode": null,
+        "stdout": [],
+        "stderr": [
+          "Provide .e basenames, source text, a submitted root filename, and a positive timeout."
+        ],
+        "elapsedMs": 0,
+        "artifactNames": []
+      },
+      {
+        "name": "missing_asset",
+        "status": "initialization_error",
+        "exitCode": null,
+        "stdout": [],
+        "stderr": [
+          "Error: Cannot load compiler library: HTTP 404.\n    at initialize (http://127.0.0.1:43071/runtime.mjs:25:33)\n    at async self.onmessage (http://127.0.0.1:43071/worker.mjs:8:46)"
+        ],
+        "artifacts": {},
+        "elapsedMs": 66.70000000018626
+      },
+      {
+        "name": "recovery_after_cancel_and_timeout",
+        "status": "success",
+        "exitCode": 0,
+        "stdout": [],
+        "stderr": [],
+        "compilationMs": 2840,
+        "linearMemoryBytes": 167051264,
+        "initializationMs": 164.5,
+        "resources": [
+          {
+            "name": "http://127.0.0.1:43071/runtime.mjs",
+            "transferSize": 0,
+            "encodedBodySize": 3316,
+            "decodedBodySize": 3316,
+            "durationMs": 4.7999999998137355
+          },
+          {
+            "name": "http://127.0.0.1:43071/compiler.mjs",
+            "transferSize": 0,
+            "encodedBodySize": 209503,
+            "decodedBodySize": 209503,
+            "durationMs": 5
+          },
+          {
+            "name": "http://127.0.0.1:43071/compiler.data",
+            "transferSize": 0,
+            "encodedBodySize": 5278826,
+            "decodedBodySize": 5278826,
+            "durationMs": 16.09999999962747
+          },
+          {
+            "name": "http://127.0.0.1:43071/compiler.wasm",
+            "transferSize": 0,
+            "encodedBodySize": 4554337,
+            "decodedBodySize": 4554337,
+            "durationMs": 17.899999999441206
+          }
+        ],
+        "elapsedMs": 3062,
+        "artifactNames": [
+          "hello.c",
+          "hello.h",
+          "hello.make",
+          "hello.id"
+        ]
+      }
+    ],
+    "requests": [
+      {
+        "method": "GET",
+        "path": "/",
+        "bytes": 3644
+      },
+      {
+        "method": "GET",
+        "path": "/client.mjs",
+        "bytes": 2526
+      },
+      {
+        "method": "GET",
+        "path": "/worker.mjs",
+        "bytes": 1254
+      },
+      {
+        "method": "GET",
+        "path": "/runtime.mjs",
+        "bytes": 3316
+      },
+      {
+        "method": "GET",
+        "path": "/compiler.mjs",
+        "bytes": 209503
+      },
+      {
+        "method": "GET",
+        "path": "/compiler.data",
+        "bytes": 5278826
+      },
+      {
+        "method": "GET",
+        "path": "/compiler.wasm",
+        "bytes": 4554337
+      },
+      {
+        "method": "GET",
+        "path": "/",
+        "bytes": 3644
+      },
+      {
+        "method": "GET",
+        "path": "/client.mjs",
+        "bytes": 2526
+      },
+      {
+        "method": "GET",
+        "path": "/worker.mjs",
+        "bytes": 1254
+      },
+      {
+        "method": "GET",
+        "path": "/runtime.mjs",
+        "bytes": 3316
+      },
+      {
+        "method": "GET",
+        "path": "/compiler.mjs",
+        "bytes": 209503
+      }
+    ]
+  },
+  "execution": {
+    "passed": true,
+    "date": "2026-11-14T09:35:50.29Z",
+    "browser": "141.0.7390.37",
+    "stage1": {
+      "status": "complete",
+      "results": [
+        {
+          "name": "hello",
+          "exitCode": 0,
+          "stdout": [
+            "Hello from Liberty Eiffel and WebAssembly!",
+            "42"
+          ],
+          "stderr": []
+        },
+        {
+          "name": "contract_failure",
+          "exitCode": 1,
+          "stdout": [],
+          "stderr": [
+            "*** Error at Run Time ***: Check Assertion Violated.",
+            "*** Error at Run Time ***: expected_failure",
+            "2 frames in run-time stack.",
+            "====  Bottom of run-time stack  ====",
+            "<system root>",
+            "Current = CONTRACT_FAILURE#0x1ac38",
+            "line 7 column 4 file /generated/contract_failure.e ",
+            "======================================",
+            "make CONTRACT_FAILURE",
+            "Current = CONTRACT_FAILURE#0x1ac38",
+            "line 10 column 31 file /generated/contract_failure.e ",
+            "====  Top of run-time stack   ====",
+            "*** Error at Run Time ***: Check Assertion Violated.",
+            "*** Error at Run Time ***: expected_failure"
+          ]
+        }
+      ]
+    },
+    "status": "complete",
+    "results": [
+      {
+        "name": "hello",
+        "expected": [
+          "BrowserMarker_1794648923502_d40573885b21c"
+        ],
+        "exitCode": 0,
+        "stdout": [
+          "BrowserMarker_1794648923502_d40573885b21c"
+        ],
+        "stderr": []
+      },
+      {
+        "name": "multi",
+        "expected": [
+          "42",
+          "42"
+        ],
+        "exitCode": 0,
+        "stdout": [
+          "42",
+          "42"
+        ],
+        "stderr": []
+      }
+    ],
+    "requests": [
+      {
+        "method": "GET",
+        "path": "/",
+        "bytes": 1148
+      },
+      {
+        "method": "GET",
+        "path": "/hello.mjs",
+        "bytes": 59201
+      },
+      {
+        "method": "GET",
+        "path": "/contract_failure.mjs",
+        "bytes": 59223
+      },
+      {
+        "method": "GET",
+        "path": "/hello.wasm",
+        "bytes": 193124
+      },
+      {
+        "method": "GET",
+        "path": "/contract_failure.wasm",
+        "bytes": 138312
+      },
+      {
+        "method": "GET",
+        "path": "/validation/",
+        "bytes": 978
+      },
+      {
+        "method": "GET",
+        "path": "/validation/hello.expected.json",
+        "bytes": 45
+      },
+      {
+        "method": "GET",
+        "path": "/validation/hello.mjs",
+        "bytes": 57529
+      },
+      {
+        "method": "GET",
+        "path": "/validation/hello.wasm",
+        "bytes": 137475
+      },
+      {
+        "method": "GET",
+        "path": "/validation/multi.expected.json",
+        "bytes": 11
+      },
+      {
+        "method": "GET",
+        "path": "/validation/multi.mjs",
+        "bytes": 57529
+      },
+      {
+        "method": "GET",
+        "path": "/validation/multi.wasm",
+        "bytes": 213149
+      }
+    ]
+  },
+  "passed": true
+}
