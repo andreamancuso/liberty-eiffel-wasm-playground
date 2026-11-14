@@ -1,12 +1,17 @@
 {
   "translation": {
     "passed": true,
-    "date": "2026-11-14T09:35:41.847Z",
+    "date": "2026-11-14T10:14:21.438Z",
     "browser": "141.0.7390.37",
     "sdk": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 7.0.0 (777e6e5db7b4990bcaeb1b9998ed642cc84e6629)",
     "provenance": {
-      "sourceRevision": "21b081378ec12798080128e7f39878d5d2097cb7",
-      "sourceDiffSha256": "7aa6bf5412cf99da62cb7eabfd653425fcc561eed0bd46bb81ed37262ad6294d",
+      "sourceRepository": "https://github.com/andreamancuso/Liberty.git",
+      "sourceRevision": "b5bfa4d917dd0641b95199c91d9635814d254d9d",
+      "sourceTreeSha256": "fed78f040360d08fd252ebe65f3a45d1a43ada318fc7adb2f506c553c12af4d1",
+      "sourceDirty": false,
+      "sourceMode": "pinned-submodule",
+      "playgroundRevision": "cddd95af2b121927934c16794157d905e28996e3",
+      "playgroundTreeSha256": "8521b5efb24f3851482d594b4c256092cb928aed6797ad723f38505a9dd0a73c",
       "bootstrapImage": "sha256:fd33114558fee3b99a8727c9c5360c04ecf127e7ec5eb873c12f3d4bbd91259f",
       "flags": "Liberty -boost -no_gc -split legacy; emcc -O2; stack 16 MiB; initial 64 MiB; max 1 GiB"
     },
@@ -22,40 +27,40 @@
         "exitCode": 0,
         "stdout": [],
         "stderr": [],
-        "compilationMs": 2765.899999999441,
+        "compilationMs": 3805.5999999996275,
         "linearMemoryBytes": 167051264,
-        "initializationMs": 258.90000000037253,
+        "initializationMs": 523.1000000014901,
         "resources": [
           {
-            "name": "http://127.0.0.1:43071/runtime.mjs",
+            "name": "http://127.0.0.1:42751/runtime.mjs",
             "transferSize": 3616,
             "encodedBodySize": 3316,
             "decodedBodySize": 3316,
-            "durationMs": 9.300000000745058
+            "durationMs": 15
           },
           {
-            "name": "http://127.0.0.1:43071/compiler.mjs",
+            "name": "http://127.0.0.1:42751/compiler.mjs",
             "transferSize": 209803,
             "encodedBodySize": 209503,
             "decodedBodySize": 209503,
-            "durationMs": 10.299999999813735
+            "durationMs": 28.800000000745058
           },
           {
-            "name": "http://127.0.0.1:43071/compiler.data",
+            "name": "http://127.0.0.1:42751/compiler.data",
             "transferSize": 5279126,
             "encodedBodySize": 5278826,
             "decodedBodySize": 5278826,
-            "durationMs": 91.09999999962747
+            "durationMs": 214.2999999988824
           },
           {
-            "name": "http://127.0.0.1:43071/compiler.wasm",
+            "name": "http://127.0.0.1:42751/compiler.wasm",
             "transferSize": 4554637,
             "encodedBodySize": 4554337,
             "decodedBodySize": 4554337,
-            "durationMs": 79.79999999981374
+            "durationMs": 131.09999999962747
           }
         ],
-        "elapsedMs": 3076.9000000003725,
+        "elapsedMs": 4423.700000001118,
         "artifactNames": [
           "hello.c",
           "hello.h",
@@ -74,40 +79,40 @@
           "Line 1 column 62 in HELLO (/work/hello.e):",
           "------"
         ],
-        "compilationMs": 167.29999999981374,
+        "compilationMs": 190.30000000074506,
         "linearMemoryBytes": 67108864,
-        "initializationMs": 113.90000000037253,
+        "initializationMs": 106,
         "resources": [
           {
-            "name": "http://127.0.0.1:43071/runtime.mjs",
+            "name": "http://127.0.0.1:42751/runtime.mjs",
             "transferSize": 0,
             "encodedBodySize": 3316,
             "decodedBodySize": 3316,
-            "durationMs": 4.599999999627471
+            "durationMs": 4.300000000745058
           },
           {
-            "name": "http://127.0.0.1:43071/compiler.mjs",
+            "name": "http://127.0.0.1:42751/compiler.mjs",
             "transferSize": 0,
             "encodedBodySize": 209503,
             "decodedBodySize": 209503,
-            "durationMs": 4.2999999998137355
+            "durationMs": 3.5
           },
           {
-            "name": "http://127.0.0.1:43071/compiler.data",
+            "name": "http://127.0.0.1:42751/compiler.data",
             "transferSize": 0,
             "encodedBodySize": 5278826,
             "decodedBodySize": 5278826,
-            "durationMs": 12.099999999627471
+            "durationMs": 11.400000000372529
           },
           {
-            "name": "http://127.0.0.1:43071/compiler.wasm",
+            "name": "http://127.0.0.1:42751/compiler.wasm",
             "transferSize": 0,
             "encodedBodySize": 4554337,
             "decodedBodySize": 4554337,
-            "durationMs": 16.199999999254942
+            "durationMs": 14.400000000372529
           }
         ],
-        "elapsedMs": 317.90000000037253,
+        "elapsedMs": 322.19999999925494,
         "artifactNames": []
       },
       {
@@ -123,40 +128,40 @@
           "Line 1 columns 64, 69 in HELLO (/work/hello.e):",
           "------"
         ],
-        "compilationMs": 1686.9000000003725,
+        "compilationMs": 1647.800000000745,
         "linearMemoryBytes": 139198464,
-        "initializationMs": 149.70000000018626,
+        "initializationMs": 118.59999999962747,
         "resources": [
           {
-            "name": "http://127.0.0.1:43071/runtime.mjs",
+            "name": "http://127.0.0.1:42751/runtime.mjs",
             "transferSize": 0,
             "encodedBodySize": 3316,
             "decodedBodySize": 3316,
-            "durationMs": 4.2999999998137355
+            "durationMs": 3.599999999627471
           },
           {
-            "name": "http://127.0.0.1:43071/compiler.mjs",
+            "name": "http://127.0.0.1:42751/compiler.mjs",
             "transferSize": 0,
             "encodedBodySize": 209503,
             "decodedBodySize": 209503,
-            "durationMs": 3.2999999998137355
+            "durationMs": 4
           },
           {
-            "name": "http://127.0.0.1:43071/compiler.data",
+            "name": "http://127.0.0.1:42751/compiler.data",
             "transferSize": 0,
             "encodedBodySize": 5278826,
             "decodedBodySize": 5278826,
-            "durationMs": 11.299999999813735
+            "durationMs": 13.400000000372529
           },
           {
-            "name": "http://127.0.0.1:43071/compiler.wasm",
+            "name": "http://127.0.0.1:42751/compiler.wasm",
             "transferSize": 0,
             "encodedBodySize": 4554337,
             "decodedBodySize": 4554337,
-            "durationMs": 19.90000000037253
+            "durationMs": 17.299999998882413
           }
         ],
-        "elapsedMs": 1873.5999999996275,
+        "elapsedMs": 1803.800000000745,
         "artifactNames": []
       },
       {
@@ -170,40 +175,40 @@
           "Line 1 column 53 in HELLO (/work/hello.e):",
           "------"
         ],
-        "compilationMs": 278.29999999981374,
+        "compilationMs": 274.5,
         "linearMemoryBytes": 67108864,
-        "initializationMs": 100.40000000037253,
+        "initializationMs": 105.09999999962747,
         "resources": [
           {
-            "name": "http://127.0.0.1:43071/runtime.mjs",
+            "name": "http://127.0.0.1:42751/runtime.mjs",
             "transferSize": 0,
             "encodedBodySize": 3316,
             "decodedBodySize": 3316,
-            "durationMs": 2.7000000001862645
+            "durationMs": 2.800000000745058
           },
           {
-            "name": "http://127.0.0.1:43071/compiler.mjs",
+            "name": "http://127.0.0.1:42751/compiler.mjs",
             "transferSize": 0,
             "encodedBodySize": 209503,
             "decodedBodySize": 209503,
-            "durationMs": 2.699999999254942
+            "durationMs": 3
           },
           {
-            "name": "http://127.0.0.1:43071/compiler.data",
+            "name": "http://127.0.0.1:42751/compiler.data",
             "transferSize": 0,
             "encodedBodySize": 5278826,
             "decodedBodySize": 5278826,
-            "durationMs": 9.700000000186265
+            "durationMs": 10.700000001117587
           },
           {
-            "name": "http://127.0.0.1:43071/compiler.wasm",
+            "name": "http://127.0.0.1:42751/compiler.wasm",
             "transferSize": 0,
             "encodedBodySize": 4554337,
             "decodedBodySize": 4554337,
-            "durationMs": 14.100000000558794
+            "durationMs": 15.699999999254942
           }
         ],
-        "elapsedMs": 416.3999999994412,
+        "elapsedMs": 414.5,
         "artifactNames": []
       },
       {
@@ -212,40 +217,40 @@
         "exitCode": 0,
         "stdout": [],
         "stderr": [],
-        "compilationMs": 2648.9000000003725,
+        "compilationMs": 6014.4000000003725,
         "linearMemoryBytes": 167051264,
-        "initializationMs": 149.19999999925494,
+        "initializationMs": 160.69999999925494,
         "resources": [
           {
-            "name": "http://127.0.0.1:43071/runtime.mjs",
+            "name": "http://127.0.0.1:42751/runtime.mjs",
             "transferSize": 0,
             "encodedBodySize": 3316,
             "decodedBodySize": 3316,
-            "durationMs": 3.199999999254942
+            "durationMs": 3.599999999627471
           },
           {
-            "name": "http://127.0.0.1:43071/compiler.mjs",
+            "name": "http://127.0.0.1:42751/compiler.mjs",
             "transferSize": 0,
             "encodedBodySize": 209503,
             "decodedBodySize": 209503,
-            "durationMs": 3.7000000001862645
+            "durationMs": 3.5
           },
           {
-            "name": "http://127.0.0.1:43071/compiler.data",
+            "name": "http://127.0.0.1:42751/compiler.data",
             "transferSize": 0,
             "encodedBodySize": 5278826,
             "decodedBodySize": 5278826,
-            "durationMs": 11.200000000186265
+            "durationMs": 12.800000000745058
           },
           {
-            "name": "http://127.0.0.1:43071/compiler.wasm",
+            "name": "http://127.0.0.1:42751/compiler.wasm",
             "transferSize": 0,
             "encodedBodySize": 4554337,
             "decodedBodySize": 4554337,
-            "durationMs": 17.700000000186265
+            "durationMs": 16.200000001117587
           }
         ],
-        "elapsedMs": 2826.7999999998137,
+        "elapsedMs": 6207.299999998882,
         "artifactNames": [
           "hello.c",
           "hello.h",
@@ -259,40 +264,40 @@
         "exitCode": 0,
         "stdout": [],
         "stderr": [],
-        "compilationMs": 2757.300000000745,
+        "compilationMs": 3615.5,
         "linearMemoryBytes": 167051264,
-        "initializationMs": 105.5,
+        "initializationMs": 183.09999999962747,
         "resources": [
           {
-            "name": "http://127.0.0.1:43071/runtime.mjs",
+            "name": "http://127.0.0.1:42751/runtime.mjs",
             "transferSize": 0,
             "encodedBodySize": 3316,
             "decodedBodySize": 3316,
-            "durationMs": 3.1000000005587935
+            "durationMs": 4.5
           },
           {
-            "name": "http://127.0.0.1:43071/compiler.mjs",
+            "name": "http://127.0.0.1:42751/compiler.mjs",
             "transferSize": 0,
             "encodedBodySize": 209503,
             "decodedBodySize": 209503,
-            "durationMs": 3.2999999998137355
+            "durationMs": 5.099999999627471
           },
           {
-            "name": "http://127.0.0.1:43071/compiler.data",
+            "name": "http://127.0.0.1:42751/compiler.data",
             "transferSize": 0,
             "encodedBodySize": 5278826,
             "decodedBodySize": 5278826,
-            "durationMs": 11.600000000558794
+            "durationMs": 19.40000000037253
           },
           {
-            "name": "http://127.0.0.1:43071/compiler.wasm",
+            "name": "http://127.0.0.1:42751/compiler.wasm",
             "transferSize": 0,
             "encodedBodySize": 4554337,
             "decodedBodySize": 4554337,
-            "durationMs": 14.599999999627471
+            "durationMs": 25.300000000745058
           }
         ],
-        "elapsedMs": 2915.9000000003725,
+        "elapsedMs": 3875.4000000003725,
         "artifactNames": [
           "hello.c",
           "hello.h",
@@ -309,7 +314,7 @@
           "Compilation cancelled."
         ],
         "artifacts": {},
-        "elapsedMs": 9.199999999254942
+        "elapsedMs": 9.300000000745058
       },
       {
         "name": "cancel_compiling",
@@ -320,7 +325,7 @@
           "Compilation cancelled."
         ],
         "artifacts": {},
-        "elapsedMs": 123.6000000005588
+        "elapsedMs": 137.5
       },
       {
         "name": "timeout",
@@ -350,10 +355,10 @@
         "exitCode": null,
         "stdout": [],
         "stderr": [
-          "Error: Cannot load compiler library: HTTP 404.\n    at initialize (http://127.0.0.1:43071/runtime.mjs:25:33)\n    at async self.onmessage (http://127.0.0.1:43071/worker.mjs:8:46)"
+          "Error: Cannot load compiler library: HTTP 404.\n    at initialize (http://127.0.0.1:42751/runtime.mjs:25:33)\n    at async self.onmessage (http://127.0.0.1:42751/worker.mjs:8:46)"
         ],
         "artifacts": {},
-        "elapsedMs": 66.70000000018626
+        "elapsedMs": 81.70000000111759
       },
       {
         "name": "recovery_after_cancel_and_timeout",
@@ -361,40 +366,40 @@
         "exitCode": 0,
         "stdout": [],
         "stderr": [],
-        "compilationMs": 2840,
+        "compilationMs": 2990.800000000745,
         "linearMemoryBytes": 167051264,
-        "initializationMs": 164.5,
+        "initializationMs": 199.5,
         "resources": [
           {
-            "name": "http://127.0.0.1:43071/runtime.mjs",
+            "name": "http://127.0.0.1:42751/runtime.mjs",
             "transferSize": 0,
             "encodedBodySize": 3316,
             "decodedBodySize": 3316,
-            "durationMs": 4.7999999998137355
+            "durationMs": 4.599999999627471
           },
           {
-            "name": "http://127.0.0.1:43071/compiler.mjs",
+            "name": "http://127.0.0.1:42751/compiler.mjs",
             "transferSize": 0,
             "encodedBodySize": 209503,
             "decodedBodySize": 209503,
-            "durationMs": 5
+            "durationMs": 5.599999999627471
           },
           {
-            "name": "http://127.0.0.1:43071/compiler.data",
+            "name": "http://127.0.0.1:42751/compiler.data",
             "transferSize": 0,
             "encodedBodySize": 5278826,
             "decodedBodySize": 5278826,
-            "durationMs": 16.09999999962747
+            "durationMs": 18
           },
           {
-            "name": "http://127.0.0.1:43071/compiler.wasm",
+            "name": "http://127.0.0.1:42751/compiler.wasm",
             "transferSize": 0,
             "encodedBodySize": 4554337,
             "decodedBodySize": 4554337,
-            "durationMs": 17.899999999441206
+            "durationMs": 23
           }
         ],
-        "elapsedMs": 3062,
+        "elapsedMs": 3252.5999999996275,
         "artifactNames": [
           "hello.c",
           "hello.h",
@@ -466,9 +471,10 @@
       }
     ]
   },
+  "passed": true,
   "execution": {
     "passed": true,
-    "date": "2026-11-14T09:35:50.29Z",
+    "date": "2026-11-14T10:14:49.59Z",
     "browser": "141.0.7390.37",
     "stage1": {
       "status": "complete",
@@ -510,11 +516,11 @@
       {
         "name": "hello",
         "expected": [
-          "BrowserMarker_1794648923502_d40573885b21c"
+          "BrowserMarker_1794651237087_6071acc13060b"
         ],
         "exitCode": 0,
         "stdout": [
-          "BrowserMarker_1794648923502_d40573885b21c"
+          "BrowserMarker_1794651237087_6071acc13060b"
         ],
         "stderr": []
       },
@@ -594,6 +600,5 @@
         "bytes": 213149
       }
     ]
-  },
-  "passed": true
+  }
 }

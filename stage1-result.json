@@ -1,7 +1,7 @@
 {
   "passed": true,
-  "date": "2026-11-14T08:46:30.988Z",
-  "sourceRevision": "21b081378ec12798080128e7f39878d5d2097cb7",
+  "date": "2026-11-14T10:14:55.854Z",
+  "sourceRevision": "b5bfa4d917dd0641b95199c91d9635814d254d9d",
   "emscriptenVersion": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 7.0.0 (777e6e5db7b4990bcaeb1b9998ed642cc84e6629)",
   "browser": "141.0.7390.37",
   "wasmBytes": {
@@ -11,23 +11,23 @@
   "requests": [
     {
       "method": "GET",
-      "url": "http://127.0.0.1:33451/"
+      "url": "http://127.0.0.1:44383/"
     },
     {
       "method": "GET",
-      "url": "http://127.0.0.1:33451/hello.mjs"
+      "url": "http://127.0.0.1:44383/hello.mjs"
     },
     {
       "method": "GET",
-      "url": "http://127.0.0.1:33451/contract_failure.mjs"
+      "url": "http://127.0.0.1:44383/contract_failure.mjs"
     },
     {
       "method": "GET",
-      "url": "http://127.0.0.1:33451/hello.wasm"
+      "url": "http://127.0.0.1:44383/hello.wasm"
     },
     {
       "method": "GET",
-      "url": "http://127.0.0.1:33451/contract_failure.wasm"
+      "url": "http://127.0.0.1:44383/contract_failure.wasm"
     }
   ],
   "status": "complete",
