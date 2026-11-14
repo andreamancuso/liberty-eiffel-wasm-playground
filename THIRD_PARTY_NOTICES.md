@@ -12,6 +12,14 @@ It does not replace the licenses of the compiler, libraries, or build tools.
   C library support, with the notices and licenses in that distribution.
 - **Playwright:** the pinned npm dependency is Apache-2.0 and is used only for
   browser verification. Its package retains its license.
+- **Browser Clang/LLD, memfs and WASI support:** stage 3 pins
+  cppstudio-io/wasm-clang-runtime v0.1.0 and its source revision, derived from
+  binji/wasm-clang. The runtime and memfs carry Apache-2.0 notices; LLVM uses
+  Apache-2.0 with LLVM Exceptions. The WASI SDK distribution supplies the matching
+  C library. Download hashes are in `stage3/toolchain.lock.json`. Runtime LICENSE,
+  LICENSE.llvm and NOTICE are included in the generated site's `licenses/`.
+  Our ES-module export and filesystem injection adjustments are recorded in
+  `stage3/patch-runtime.py`; I/O handling is supplied by `stage3/wasi.mjs`.
 
 Generated Eiffel C and headers retain Liberty's generated notices. The submodule
 retains the compiler and library sources and their original copyright headers.
