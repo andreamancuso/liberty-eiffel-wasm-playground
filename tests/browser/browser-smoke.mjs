@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFile, writeFile, rm } from "node:fs/promises";
+import { readFile, writeFile, rm, mkdir } from "node:fs/promises";
 import { createServer } from "node:http";
 import path from "node:path";
 import { chromium } from "playwright";
@@ -12,6 +12,7 @@ import {
 } from "./ui-checks.mjs";
 import { libraryCases } from "./library-fixtures.mjs";
 import { checkDownloadUI } from "./download-ui.mjs";
+import { siteInventory } from "./site-inventory.mjs";
 import { setTimeout as delay } from "node:timers/promises";
 const root = "/artifacts",
   requests = [],
@@ -22,7 +23,10 @@ const basePath =
 assert.match(basePath, /^\/(?:[a-zA-Z0-9_-]+\/)*$/);
 let encodedGzip = false;
 let delivery = "normal";
-await rm(`${root}/browser-result.json`, { force: true });
+const reportDir = process.env.REPORT_DIR ?? "/reports";
+await mkdir(reportDir, { recursive: true });
+await rm(`${reportDir}/browser-result.json`, { force: true });
+const testedFiles = await siteInventory(root);
 const types = {
   ".html": "text/html",
   ".mjs": "text/javascript",
@@ -72,7 +76,7 @@ const server = createServer(async (req, res) => {
     if (mode === "timeout" && file.endsWith(".gz") && content.length > 524288) {
       // Keep a real transfer open until the client's deadline closes it.
       res.write(content.subarray(0, 524288));
-      await new Promise(resolve => res.once("close", resolve));
+      await new Promise((resolve) => res.once("close", resolve));
       return;
     }
     if (["slow", "unknown"].includes(mode) && file.endsWith(".gz")) {
@@ -462,10 +466,7 @@ try {
     await readFile(`${root}/runtime/eiffel/provenance.json`, "utf8"),
   );
   const assets = JSON.parse(
-    await readFile(
-      `${root}/runtime/wasi/toolchain/assets.json`,
-      "utf8",
-    ),
+    await readFile(`${root}/runtime/wasi/toolchain/assets.json`, "utf8"),
   );
   const toolchain = JSON.parse(
     await readFile(
@@ -474,10 +475,11 @@ try {
     ),
   );
   await writeFile(
-    `${root}/browser-result.json`,
+    `${reportDir}/browser-result.json`,
     JSON.stringify(
       {
         passed: true,
+        testedFiles,
         date: new Date().toISOString(),
         browser: browser.version(),
         provenance,
@@ -490,7 +492,7 @@ try {
       2,
     ) + "\n",
   );
-  await page.screenshot({ path: `${root}/browser.png`, fullPage: true });
+  await page.screenshot({ path: `${reportDir}/browser.png`, fullPage: true });
   console.log(
     "PASS: full browser pipeline, contracts, UTF-8 stdin/EOF, failures, cancellation, limits, recovery and UI.",
   );

@@ -11,13 +11,19 @@ The public beta targets desktop Chrome and Edge. Its first run downloads roughly
 
 The `CI` workflow runs on pull requests, pushes to `main`, and manual dispatch.
 It recursively checks out the pinned Liberty fork, runs `build.ps1`, and
-packages the passing static site. It repeats browser acceptance against the
-packaged bytes under `/liberty-eiffel-wasm-playground/` and verifies the inventory.
+builds the final candidate, and runs full browser acceptance once against its
+read-only files under `/liberty-eiffel-wasm-playground/`. A passing report records
+the tested inventory. Sealing compares that inventory with the candidate before
+adding `release.json`, then verifies the release. Diagnostics stay outside the
+site directory.
 Both opaque gzip and HTTP `Content-Encoding: gzip` delivery are tested.
 
 The first native bootstrap can take half an hour. CI allows 180 minutes and logs
-time, free disk, and Docker storage. It starts without a persistent build cache;
-local Docker builds still reuse layers. Generated binaries are not committed.
+time, free disk, and Docker storage. Native, compiler, and toolchain layers use
+separate persistent CI caches; local builds reuse Docker's local cache. The
+manual `cold_build` input bypasses reuse while still allowing cache export.
+Cache transfer costs and build timings appear in the workflow summary.
+Generated binaries are not committed.
 
 Successful runs produce `playground-site-<full-commit-SHA>` and diagnostic
 artifacts, retained for seven days. The site contains third-party licenses,
@@ -27,7 +33,7 @@ compiler/toolchain provenance, and `release.json` with:
 - `ciRunId` and `ciRunUrl` identifying the build;
 - `files`, an inventory of relative paths, byte lengths, and SHA-256 checksums.
 
-The manifest inventories every published file except itself. Packaging rejects
+The manifest inventories every published file except itself. Sealing rejects
 failed reports, mismatched revisions, dirty/unpinned compiler sources, symlinks,
 and packages reaching the Pages 1 GB limit. Publication verifies that inventory
 again, including missing, additional, or changed files.

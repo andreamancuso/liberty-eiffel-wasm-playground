@@ -1,10 +1,9 @@
-"""Package or verify the exact static bytes promoted from CI to Pages."""
+"""Seal or verify the exact static bytes promoted from CI to Pages."""
 import argparse
 import hashlib
 import json
 import pathlib
 import re
-import shutil
 
 
 def inventory(root):
@@ -37,35 +36,34 @@ def verify(root, revision, run_id, run_url):
     return manifest
 
 
-def package(source, dest, revision, run_id, run_url):
-    report = json.loads((source / 'browser-result.json').read_text())
+def seal(root, report_path, revision, run_id, run_url):
+    report = json.loads(report_path.read_text())
     if not report['passed'] or report['provenance']['playgroundRevision'] != revision:
-        raise ValueError('Packaging requires a passing browser report for this revision')
-    # A new destination avoids quietly retaining files from an older release.
-    shutil.copytree(source, dest, symlinks=True, ignore=shutil.ignore_patterns('*-result.json', '*.png'))
-    (dest / '.nojekyll').touch()
+        raise ValueError('Sealing requires a passing browser report for this revision')
+    if report['testedFiles'] != inventory(root):
+        raise ValueError('Candidate differs from the files verified by the browser suite')
     manifest = dict(schemaVersion=1, playgroundRevision=revision,
                     libertyRevision=report['provenance']['sourceRevision'],
-                    ciRunId=str(run_id), ciRunUrl=run_url, files=inventory(dest))
-    (dest / 'release.json').write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
-    return verify(dest, revision, run_id, run_url)
+                    ciRunId=str(run_id), ciRunUrl=run_url, files=report['testedFiles'])
+    (root / 'release.json').write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
+    return verify(root, revision, run_id, run_url)
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=['package', 'verify'])
+    parser.add_argument('command', choices=['seal', 'verify'])
     parser.add_argument('--site', type=pathlib.Path, required=True)
-    parser.add_argument('--source', type=pathlib.Path)
+    parser.add_argument('--report', type=pathlib.Path)
     parser.add_argument('--revision', required=True)
     parser.add_argument('--run-id', required=True)
     parser.add_argument('--run-url', required=True)
     args = parser.parse_args()
     if not re.fullmatch('[0-9a-f]{40}', args.revision) or not args.run_id.isdecimal():
         parser.error('Expected a full commit SHA and numeric CI run ID')
-    if args.command == 'package':
-        if args.source is None:
-            parser.error('--source is required for packaging')
-        manifest = package(args.source, args.site, args.revision, args.run_id, args.run_url)
+    if args.command == 'seal':
+        if args.report is None:
+            parser.error('--report is required for sealing')
+        manifest = seal(args.site, args.report, args.revision, args.run_id, args.run_url)
     else:
         manifest = verify(args.site, args.revision, args.run_id, args.run_url)
     print(f"Verified {len(manifest['files'])} files, {sum(f['bytes'] for f in manifest['files'])} bytes, revision {args.revision}")

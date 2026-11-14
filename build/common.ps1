@@ -60,13 +60,9 @@ function Get-LibertySource([string]$PlaygroundRoot, [string]$Override) {
     }
 }
 
-function Ensure-NativeCompiler($Source, [switch]$Rebuild) {
-    $exists = & docker image ls --quiet liberty-playground:native
-    if ($LASTEXITCODE -ne 0) { throw 'Cannot inspect Docker images.' }
-    if (-not $exists -or $Rebuild) {
-        & docker build --platform linux/amd64 -f build/native.Dockerfile --build-context "liberty_source=$($Source.Path)" -t liberty-playground:native .
-        if ($LASTEXITCODE -ne 0) { throw 'Native bootstrap failed.' }
-    }
+function Ensure-NativeCompiler($Source, [switch]$Rebuild, [switch]$CiCache, [switch]$ColdBuild) {
+    Invoke-DockerBuild -Name native -CacheScope native -CiCache:$CiCache -ColdBuild:($ColdBuild -or $Rebuild) -Arguments @(
+        '-f', 'build/native.Dockerfile', '--build-context', "liberty_source=$($Source.Path)", '-t', 'liberty-playground:native', '.')
     $imageId = & docker image inspect liberty-playground:native --format '{{.Id}}'
     if ($LASTEXITCODE -ne 0) { throw 'Cannot identify native compiler image.' }
     return $imageId

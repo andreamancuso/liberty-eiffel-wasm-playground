@@ -31,6 +31,10 @@ submitted source; contract failures display their named precondition,
 postcondition, or invariant. The library example keeps loan state in memory,
 uses a generic catalogue, and derives counts instead of caching them.
 
+The final site is browser-tested once through a read-only mount. Its file
+inventory travels in the test report; release sealing rejects any change to
+those bytes. Browser reports and screenshots remain outside the candidate.
+
 Build and release metadata identify both playground and Liberty revisions.
 Generated assets and reports stay under ignored `artifacts/`; source control
 contains neither generated compiler binaries nor historical report snapshots.

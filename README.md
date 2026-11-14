@@ -18,7 +18,9 @@ git submodule update --init --recursive
 The build bootstraps Liberty, packages its browser compiler and C toolchain,
 builds the React interface, and runs compiler and browser regressions with
 external networking disabled. Output goes to `artifacts/site/`.
-The first native bootstrap can take half an hour; subsequent builds reuse it.
+The first native bootstrap can take half an hour; subsequent builds reuse layers.
+CI persists the expensive compiler caches and runs the full browser suite once
+against the final site. See the build guide for cold-build switches and timings.
 
 For compiler source development, use your fork checkout:
 

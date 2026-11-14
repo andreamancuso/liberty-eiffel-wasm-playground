@@ -11,5 +11,6 @@ COPY --from=compiler_output /runtime/eiffel/ /out/runtime/eiffel/
 COPY --from=compiler_output /licenses/ /out/licenses/liberty/
 COPY runtime/ /out/runtime/
 COPY --from=frontend /ui/dist/ /out/
+RUN touch /out/.nojekyll
 FROM scratch AS artifacts
 COPY --from=site /out/ /
