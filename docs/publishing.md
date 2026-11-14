@@ -5,7 +5,7 @@ The playground is a static application linked from beyond-tabs.com:
 <https://andreamancuso.github.io/liberty-eiffel-wasm-playground/>
 
 The public beta targets desktop Chrome and Edge. Its first run downloads roughly
-33 MB. Compilation and program execution take place in browser workers.
+25 MB. Compilation and program execution take place in browser workers.
 
 ## CI
 
@@ -51,7 +51,7 @@ configuration. No custom domain or special cross-origin headers are required.
    ```
 
 The publisher accepts only a successful same-repository `main` run from `ci.yml`.
-It downloads and verifies the selected artifact, then uses the official Pages
+It checks out the selected revision’s verifier, downloads and verifies its artifact, then uses the official Pages
 upload/deploy actions without rebuilding. Publishing is manual and serialized.
 Only the deployment job gets Pages/OIDC write permissions; no long-lived
 deployment secret is needed.
@@ -78,7 +78,7 @@ linking or announcing the beta.
 
 Dispatch `publish.yml` again with an earlier successful main CI run ID whose
 artifact is still retained. This republishes the exact previous bytes and runs
-hosted verification again. If its artifact has expired, revert the affected
+hosted verification again. Historical releases use their original browser Docker recipe; the new layout uses the recipe under `tests/browser`. If its artifact has expired, revert the affected
 change on `main`, let CI rebuild and verify it, then publish that new run.
 
 The package is portable static output and can later be hosted on lima-city.

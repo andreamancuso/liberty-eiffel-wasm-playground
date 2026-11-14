@@ -17,7 +17,7 @@ RUN python3 /experiment/pack-sysroot.py
 FROM toolchain AS probe
 COPY --from=compiler_output /validation/hello/ /probe/
 RUN /sdk/bin/clang /probe/hello.c -O0 -D_WASI_EMULATED_SIGNAL -lwasi-emulated-signal -o /probe/hello.wasm
-COPY runtime/wasi/program.mjs /out/runtime/wasi/
+COPY runtime/wasi/ /out/runtime/wasi/
 COPY runtime/download.mjs /out/runtime/
 COPY tests/compiler/backend-probe.mjs /experiment/
 RUN node /experiment/backend-probe.mjs

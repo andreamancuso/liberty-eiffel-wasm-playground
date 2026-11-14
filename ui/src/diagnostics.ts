@@ -34,16 +34,15 @@ export function sourceLocations(
   }
   return found;
 }
+const contractKinds: [RegExp, string][] = [
+  [/Require Assertion Violated/i, "Precondition"],
+  [/Ensure Assertion Violated/i, "Postcondition"],
+  [/Class Invariant Violation/i, "Class invariant"],
+];
 export function contractFailure(text: string): string | null {
   const lines = text.split("\n");
   for (let i = 0; i < lines.length; i++) {
-    const kind = /Require Assertion Violated/i.test(lines[i])
-      ? "Precondition"
-      : /Ensure Assertion Violated/i.test(lines[i])
-        ? "Postcondition"
-        : /Class Invariant Violation/i.test(lines[i])
-          ? "Class invariant"
-          : null;
+    const kind = contractKinds.find(([pattern]) => pattern.test(lines[i]))?.[1];
     if (kind) {
       const tag = lines[i + 1]?.match(
         /^\*\*\* Error at Run Time \*\*\*:\s*([a-zA-Z][a-zA-Z0-9_]*)\s*$/,

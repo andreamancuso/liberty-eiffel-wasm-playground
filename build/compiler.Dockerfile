@@ -31,7 +31,8 @@ RUN LIBERTY_REVISION="$LIBERTY_REVISION" SOURCE_DIFF_SHA256="$SOURCE_DIFF_SHA256
 COPY --from=liberty_source /COPYING /out/licenses/Liberty-COPYING
 COPY --from=liberty_source /AUTHORS /out/licenses/Liberty-AUTHORS
 COPY tests/compiler/index.html /out/index.html
-COPY runtime/eiffel/client.mjs runtime/eiffel/worker.mjs /out/runtime/eiffel/
+COPY runtime/eiffel/client.mjs runtime/eiffel/worker.mjs runtime/eiffel/input.mjs /out/runtime/eiffel/
+COPY runtime/worker-request.mjs /out/runtime/
 
 FROM scratch AS artifacts
 COPY --from=wasm /out/ /

@@ -28,7 +28,7 @@ jobs:
           free -h
       - name: Release integrity regressions
         run: python3 release/test_site.py
-      - name: Build and verify all stages
+      - name: Build and verify playground
         shell: pwsh
         run: ./build.ps1
       - name: Package tested site

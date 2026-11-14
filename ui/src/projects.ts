@@ -20,26 +20,25 @@ export const freshProject = (example: Example): Project => ({
   stdin: example.stdin,
   activeFile: example.rootClass,
 });
-const own = (value: object, key: string) => Object.hasOwn(value, key);
 const validName = (name: string) => /^[a-zA-Z][a-zA-Z0-9_]*\.e$/.test(name);
 export function validProject(value: unknown): value is Project {
   if (!value || typeof value !== "object") return false;
-  const p = value as Project;
+  const project = value as Project;
   return (
-    !!p.files &&
-    typeof p.files === "object" &&
-    !Array.isArray(p.files) &&
-    Object.keys(p.files).length > 0 &&
-    Object.entries(p.files).every(
+    !!project.files &&
+    typeof project.files === "object" &&
+    !Array.isArray(project.files) &&
+    Object.keys(project.files).length > 0 &&
+    Object.entries(project.files).every(
       ([name, text]) => validName(name) && typeof text === "string",
     ) &&
-    new Set(Object.keys(p.files).map((name) => name.toLowerCase())).size ===
-      Object.keys(p.files).length &&
-    typeof p.rootClass === "string" &&
-    own(p.files, p.rootClass) &&
-    typeof p.stdin === "string" &&
-    typeof p.activeFile === "string" &&
-    own(p.files, p.activeFile)
+    new Set(Object.keys(project.files).map((name) => name.toLowerCase()))
+      .size === Object.keys(project.files).length &&
+    typeof project.rootClass === "string" &&
+    Object.hasOwn(project.files, project.rootClass) &&
+    typeof project.stdin === "string" &&
+    typeof project.activeFile === "string" &&
+    Object.hasOwn(project.files, project.activeFile)
   );
 }
 export function loadWorkspace(storage: Pick<Storage, "getItem"> | null): {
@@ -59,7 +58,7 @@ export function loadWorkspace(storage: Pick<Storage, "getItem"> | null): {
       typeof value.drafts !== "object" ||
       Array.isArray(value.drafts) ||
       Object.entries(value.drafts).some(
-        ([id, p]) => !findExample(id) || !validProject(p),
+        ([id, project]) => !findExample(id) || !validProject(project),
       )
     )
       throw new Error("Unrecognized saved workspace");
@@ -73,9 +72,8 @@ export function loadWorkspace(storage: Pick<Storage, "getItem"> | null): {
 }
 export function initialSelection(hash: string, saved: string): string {
   const requested = new URLSearchParams(hash.replace(/^#/, "")).get("example");
-  return requested
-    ? (findExample(requested)?.id ?? "hello")
-    : (findExample(saved)?.id ?? "hello");
+  const candidate = requested || saved;
+  return findExample(candidate)?.id ?? "hello";
 }
 export function modified(project: Project, example: Example) {
   return (
