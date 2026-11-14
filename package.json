@@ -1,5 +1,5 @@
 {
-  "name": "liberty-emscripten-stage1-smoke",
+  "name": "liberty-eiffel-playground-tests",
   "private": true,
   "type": "module",
   "dependencies": {

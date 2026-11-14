@@ -10,7 +10,7 @@ The public beta targets desktop Chrome and Edge. Its first run downloads roughly
 ## CI
 
 The `CI` workflow runs on pull requests, pushes to `main`, and manual dispatch.
-It recursively checks out the pinned Liberty fork, runs `build-stage3.ps1`, and
+It recursively checks out the pinned Liberty fork, runs `build.ps1`, and
 packages the passing static site. It repeats browser acceptance against the
 packaged bytes under `/liberty-eiffel-wasm-playground/` and verifies the inventory.
 Both opaque gzip and HTTP `Content-Encoding: gzip` delivery are tested.

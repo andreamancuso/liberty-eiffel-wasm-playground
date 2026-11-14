@@ -6,7 +6,7 @@ export default defineConfig({
   base: "./",
   server: {
     proxy: {
-      "^/(client\\.mjs|worker\\.mjs|wasi\\.mjs|stage2/|toolchain/)":
+      "^/runtime/":
         "http://127.0.0.1:8084",
     },
   },

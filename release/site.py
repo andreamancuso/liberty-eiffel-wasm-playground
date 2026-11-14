@@ -26,10 +26,10 @@ def verify(root, revision, run_id, run_url):
         raise ValueError('Release identity differs from the selected successful CI run')
     if manifest['files'] != inventory(root):
         raise ValueError('Published file inventory or checksums differ from release.json')
-    provenance = json.loads((root / 'stage2/provenance.json').read_text())
+    provenance = json.loads((root / 'runtime/eiffel/provenance.json').read_text())
     if provenance['playgroundRevision'] != revision or provenance['sourceRevision'] != manifest['libertyRevision'] or provenance['sourceDirty'] or provenance['sourceMode'] != 'pinned-submodule':
         raise ValueError('Release provenance is not the expected clean, pinned build')
-    for required in ['index.html', '.nojekyll', 'client.mjs', 'worker.mjs', 'wasi.mjs', 'stage2/compiler.wasm', 'stage2/compiler.data', 'toolchain/clang.wasm.gz', 'toolchain/sysroot.tar.gz']:
+    for required in ['index.html', '.nojekyll', 'runtime/client.mjs', 'runtime/worker.mjs', 'runtime/wasi/program.mjs', 'runtime/eiffel/compiler.wasm', 'runtime/eiffel/compiler.data', 'runtime/wasi/toolchain/clang.wasm.gz', 'runtime/wasi/toolchain/sysroot.tar.gz']:
         if not (root / required).is_file():
             raise ValueError(f'Missing published asset: {required}')
     if not any(entry['path'].startswith('licenses/') for entry in manifest['files']):
@@ -38,7 +38,7 @@ def verify(root, revision, run_id, run_url):
 
 
 def package(source, dest, revision, run_id, run_url):
-    report = json.loads((source / 'stage3-result.json').read_text())
+    report = json.loads((source / 'browser-result.json').read_text())
     if not report['passed'] or report['provenance']['playgroundRevision'] != revision:
         raise ValueError('Packaging requires a passing browser report for this revision')
     # A new destination avoids quietly retaining files from an older release.

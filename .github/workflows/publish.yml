@@ -33,6 +33,11 @@ jobs:
           CI_RUN_ID: ${{ inputs.ci_run_id }}
           GH_TOKEN: ${{ github.token }}
         run: python3 release/select-run.py
+      - name: Check out the selected release verifier
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ steps.select.outputs.revision }}
+          persist-credentials: false
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: ${{ steps.select.outputs.artifact }}
@@ -77,7 +82,10 @@ jobs:
           ref: ${{ needs.prepare.outputs.revision }}
           persist-credentials: false
       - name: Build pinned browser verifier
-        run: docker build -f Dockerfile.stage3-browser -t liberty-pages-verifier .
+        run: |
+          recipe=tests/browser/Dockerfile
+          if ! test -f "$recipe"; then recipe=Dockerfile.stage3-browser; fi
+          docker build -f "$recipe" -t liberty-pages-verifier .
       - name: Test the actual HTTPS site
         env:
           SITE_URL: ${{ needs.deploy.outputs.url }}

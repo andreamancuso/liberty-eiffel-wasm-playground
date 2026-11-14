@@ -30,20 +30,20 @@ jobs:
         run: python3 release/test_site.py
       - name: Build and verify all stages
         shell: pwsh
-        run: ./build-stage3.ps1
+        run: ./build.ps1
       - name: Package tested site
         env:
           REVISION: ${{ github.sha }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: >-
-          python3 release/site.py package --source artifacts/stage3 --site artifacts/pages
+          python3 release/site.py package --source artifacts/site --site artifacts/pages
           --revision "$REVISION" --run-id "$GITHUB_RUN_ID" --run-url "$RUN_URL"
       - name: Verify the packaged site under its Pages path
         run: |
-          docker run --rm --network none --mount "type=bind,source=$PWD/artifacts/pages,target=/artifacts" liberty-emscripten:stage3-browser
+          docker run --rm --network none --mount "type=bind,source=$PWD/artifacts/pages,target=/artifacts" liberty-playground:browser
           # The verifier writes diagnostics alongside the site; keep those separate.
           mkdir -p artifacts/pages-verification
-          mv artifacts/pages/stage3-result.json artifacts/pages/stage3-browser.png artifacts/pages-verification/
+          mv artifacts/pages/browser-result.json artifacts/pages/browser.png artifacts/pages-verification/
           python3 release/site.py verify --site artifacts/pages --revision "$GITHUB_SHA" --run-id "$GITHUB_RUN_ID" --run-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
       - name: Upload tested site
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

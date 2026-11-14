@@ -24,12 +24,12 @@ class ReleaseIntegrity(unittest.TestCase):
     def test_manifest_rejects_modified_extra_and_wrong_revision(self):
         with tempfile.TemporaryDirectory() as directory:
             root = pathlib.Path(directory)
-            (root / 'stage2').mkdir()
-            (root / 'licenses').mkdir()
-            (root / 'toolchain').mkdir()
+            (root / 'runtime/eiffel').mkdir(parents=True)
+            (root / 'licenses').mkdir(parents=True)
+            (root / 'runtime/wasi/toolchain').mkdir(parents=True)
             provenance = dict(playgroundRevision='a'*40, sourceRevision='b'*40, sourceDirty=False, sourceMode='pinned-submodule')
-            (root / 'stage2/provenance.json').write_text(json.dumps(provenance))
-            for name in ['index.html', '.nojekyll', 'client.mjs', 'worker.mjs', 'wasi.mjs', 'stage2/compiler.wasm', 'stage2/compiler.data', 'toolchain/clang.wasm.gz', 'toolchain/sysroot.tar.gz', 'licenses/NOTICE']:
+            (root / 'runtime/eiffel/provenance.json').write_text(json.dumps(provenance))
+            for name in ['index.html', '.nojekyll', 'runtime/client.mjs', 'runtime/worker.mjs', 'runtime/wasi/program.mjs', 'runtime/eiffel/compiler.wasm', 'runtime/eiffel/compiler.data', 'runtime/wasi/toolchain/clang.wasm.gz', 'runtime/wasi/toolchain/sysroot.tar.gz', 'licenses/NOTICE']:
                 (root / name).write_text('fixture')
             manifest = dict(schemaVersion=1, playgroundRevision='a'*40, libertyRevision='b'*40, ciRunId='123', ciRunUrl='https://example.test/run/123', files=site.inventory(root))
             (root / 'release.json').write_text(json.dumps(manifest))

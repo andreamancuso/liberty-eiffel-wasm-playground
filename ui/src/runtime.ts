@@ -27,11 +27,11 @@ export interface Runtime {
 }
 declare global {
   interface Window {
-    stage3: Runtime;
+    playground: Runtime;
   }
 }
 // Keep generated runtime modules and worker-relative URLs out of Vite's graph.
-const url = new URL("./client.mjs", document.baseURI).href;
+const url = new URL("./runtime/client.mjs", document.baseURI).href;
 export const runtimeReady: Promise<Runtime> = import(
   /* @vite-ignore */ url
 ).then((module) => {
@@ -40,6 +40,6 @@ export const runtimeReady: Promise<Runtime> = import(
     getActiveWorkerCount: module.getActiveWorkerCount,
     lastResult: null,
   };
-  window.stage3 = runtime;
+  window.playground = runtime;
   return runtime;
 });
