@@ -25,7 +25,7 @@ separate `liberty-native-linux-amd64-v1`, `liberty-compiler-linux-amd64-v1`, and
 `liberty-toolchain-linux-amd64-v1` scopes. Intermediate layers are exported with
 `mode=max`. Docker's input hashes determine reuse, while playground provenance
 is regenerated for the current revision after the expensive compiler layers.
-Main pushes/manual runs export caches; PR runs only import. Cache misses build
+Main-branch pushes and manual runs export caches; PR runs only import. Cache misses build
 normally and failed cache exports do not fail an otherwise successful build.
 
 CI configures Docker's containerd image store and default Docker driver so later
@@ -43,6 +43,12 @@ publication. Reports are never restored from build caches.
 Build logs and elapsed times live in `artifacts/build-logs`, and CI summarizes
 cached steps and cache-transfer durations. Compare cold and warm run summaries
 rather than assuming a cache hit makes transfers free.
+
+The first [measured cold CI run](https://github.com/andreamancuso/liberty-eiffel-wasm-playground/actions/runs/43637238890)
+took 26 minutes 7 seconds, including setup, all checks, sealing, and cache export.
+The native build accounted for 972.8 seconds, including 15.5 seconds in its cache
+export vertex. The three build scopes populated roughly 1.66 GB of cache data.
+Use subsequent run summaries to compare warm timings, including transfer costs.
 
 For UI-only checks, run `npm ci`, `npm test`, and `npm run build` in `ui/`.
 For development, serve `artifacts/site` on port 8084 and run `npm run dev` in
