@@ -68,6 +68,27 @@ project editing, saved drafts, keyboard controls, and storage-unavailable mode.
 SQLite is a separate feasibility task. There is no database example or browser
 persistence for databases in this release.
 
+## Library-loan showcase
+
+Open `#example=library-loans` for the in-memory library example. `main.e` sets up
+three books and two borrowers, then borrows and returns books and prints the
+catalogue. `library.e` owns a private `LINKED_LIST[BOOK]`; `book.e` holds each
+book's current borrower, and `borrower.e` defines names and positive loan limits.
+Counts are derived from book state. Loan-state mutators are exported only to
+`LIBRARY`, and catalogue membership compares object identity rather than titles.
+The example models one library; limits apply within that catalogue.
+
+The primary experiment attempts to borrow an unavailable book. Optional hints
+exercise loan limits, return ownership, a missing state update, and the library
+invariant after bypassing a precondition. Contracts stop the current run; Reset
+restores the valid scenario. Each Run creates fresh domain objects. Existing
+draft saving continues to preserve source and input, not library data.
+
+The catalogue source is `ui/src/library-example.ts`. Browser regression tests
+verify final assignments and counts, the named negative cases, `old` query
+postconditions, and the invariant. Offline and live UI checks cover the direct
+link, four files, failure navigation to `library.e`, Reset, and recovery.
+
 ## API and lifetime
 
 ```javascript

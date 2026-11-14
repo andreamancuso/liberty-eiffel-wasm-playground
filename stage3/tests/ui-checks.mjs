@@ -118,3 +118,35 @@ export async function checkUnavailableStorage(browser, url) {
         assert.equal((await runUI(page)).stdout, 'Hello, world!\n');
     } finally { await context.close(); }
 }
+
+export async function checkLibraryUI(page, baseUrl) {
+    await page.goto(new URL('#example=library-loans', baseUrl).href);
+    await page.waitForSelector('.cm-content');
+    await page.waitForFunction(() => !!window.stage3 && document.getElementById('example').value === 'library-loans');
+    const catalogue = await (await page.request.get(new URL('examples.json', baseUrl).href)).json();
+    const example = catalogue.find(value => value.id === 'library-loans');
+    assert.ok(example);
+    assert.equal(await page.getByRole('tab').count(), 4);
+    assert.equal(await page.getByLabel('Run file', { exact:true }).inputValue(), 'main.e');
+    let result = await runUI(page);
+    assert.equal(result.status, 'success', result.diagnostics);
+    assert.equal(result.stdout, example.expectedOutput);
+    assert.equal(await page.locator('#errors').isVisible(), false);
+    // CodeMirror virtualizes long files: DOM text is not the complete document.
+    const source = example.files['main.e'];
+    await setSource(page, source.replace('library.borrow(intro, ada)', 'library.borrow(intro, ada)\n         library.borrow(intro, grace)'));
+    result = await runUI(page);
+    assert.equal(result.status, 'program_error', result.diagnostics);
+    assert.match(await page.locator('#errors h2').textContent(), /Precondition failed: book_available/);
+    await page.locator('.source-links button').filter({ hasText:'library.e:' }).first().click();
+    assert.equal(await page.getByRole('tab', { name:'library.e' }).getAttribute('aria-selected'), 'true');
+    assert.match(await page.locator('.cm-content').innerText(), /within_loan_limit/);
+    await page.getByRole('button', { name:'Reset', exact:true }).click();
+    await page.getByRole('button', { name:'Reset project', exact:true }).click();
+    assert.equal(await page.getByRole('tab', { name:'main.e' }).getAttribute('aria-selected'), 'true');
+    result = await runUI(page);
+    assert.equal(result.status, 'success', result.diagnostics);
+    assert.equal(result.stdout, example.expectedOutput);
+    assert.equal(await page.locator('#errors').isVisible(), false);
+    return { name:'library_workspace', status:'success', elapsedMs:result.elapsedMs };
+}

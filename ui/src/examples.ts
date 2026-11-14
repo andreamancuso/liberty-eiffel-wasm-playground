@@ -1,3 +1,5 @@
+import { libraryExample } from "./library-example.ts";
+
 export interface Example {
   id: string;
   title: string;
@@ -257,6 +259,7 @@ end
     stdin: "",
     expectedOutput: "Balance: 70\n",
   },
+  libraryExample,
   {
     id: "my-program",
     title: "My program",

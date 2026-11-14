@@ -66,6 +66,9 @@ The learning workspace checks also cover contract failure navigation, class-file
 operations, local draft restoration, Reset, and keyboard Run. The full offline
 suite runs all example programs and verifies preconditions, postconditions with
 `old`, invariants, and operation when local storage is unavailable.
+The library-loan example adds final-state and business-rule contract checks;
+live verification also opens its direct link, triggers an unavailable-book
+failure, navigates to `library.e`, resets the example, and runs it successfully.
 
 A failed hosted check marks the workflow failed **after publication**, so that
 site remains live until another deployment. Inspect its diagnostics before

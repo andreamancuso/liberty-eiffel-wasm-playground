@@ -4,7 +4,8 @@ import { createServer } from 'node:http';
 import path from 'node:path';
 import { chromium } from 'playwright';
 import { hello, multi, invalid } from './stage2-fixtures.mjs';
-import { setSource, checkLearningUI, checkUnavailableStorage } from './ui-checks.mjs';
+import { setSource, checkLearningUI, checkUnavailableStorage, checkLibraryUI } from './ui-checks.mjs';
+import { libraryCases } from './library-fixtures.mjs';
 const root = '/artifacts', requests = [], errors = [], results = [];
 const basePath = process.env.SITE_BASE_PATH ?? '/liberty-eiffel-wasm-playground/';
 assert.match(basePath, /^\/(?:[a-zA-Z0-9_-]+\/)*$/);
@@ -50,6 +51,15 @@ try {
     for (const example of catalogue) {
         const result = await run('example_' + example.id, example);
         assert.equal(result.status, 'success', result.diagnostics); assert.equal(result.stdout, example.expectedOutput);
+    }
+    for (const test of libraryCases(catalogue.find(example => example.id === 'library-loans'))) {
+        const result = await run(test.name, test.input);
+        assert.equal(result.status, test.status, result.diagnostics);
+        if (test.stdout !== undefined) assert.equal(result.stdout, test.stdout);
+        if (test.tag) {
+            assert.ok(result.stderr.includes(test.kind), result.stderr);
+            assert.match(result.stderr, new RegExp('\\*\\*\\* Error at Run Time \\*\\*\\*: ' + test.tag + '\\n'));
+        }
     }
     let result = await run('cold_hello', hello(marker));
     assert.equal(result.status,'success',result.diagnostics + result.error); assert.equal(result.stdout,marker+'\n'); assert.equal(result.stderr,'');
@@ -122,6 +132,7 @@ try {
     assert.equal(await page.evaluate(()=>window.stage3.lastResult.status),'success');
     assert.equal(await page.locator('#errors').isVisible(), false); assert.deepEqual(errors,[]);
     results.push(await checkLearningUI(page, siteUrl, { full:true }));
+    results.push(await checkLibraryUI(page, siteUrl));
     await checkUnavailableStorage(browser, siteUrl);
     assert.deepEqual(errors, []);
     // A fresh context prevents the opaque response cache masking HTTP decoding.

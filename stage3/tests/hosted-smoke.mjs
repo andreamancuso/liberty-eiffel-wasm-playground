@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { chromium } from 'playwright';
 import { hello } from './stage2-fixtures.mjs';
-import { setSource, checkLearningUI } from './ui-checks.mjs';
+import { setSource, checkLearningUI, checkLibraryUI } from './ui-checks.mjs';
 
 const url = new URL(process.argv[2]);
 assert.equal(url.protocol, 'https:');
@@ -77,6 +77,7 @@ try {
     assert.equal(result.stdout, marker+'_recovery\n');
     assert.equal(await page.locator('#errors').isVisible(), false);
     report.results.push(await checkLearningUI(page, url.href));
+    report.results.push(await checkLibraryUI(page, url.href));
     for (const response of report.requests) {
         if (response.url.endsWith('.mjs')) assert.match(response.headers['content-type'] ?? '', /javascript/);
         if (response.url.endsWith('/compiler.wasm')) assert.match(response.headers['content-type'] ?? '', /application\/wasm/);
