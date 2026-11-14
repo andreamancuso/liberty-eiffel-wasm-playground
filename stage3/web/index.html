@@ -2,6 +2,8 @@
 <title>Liberty Eiffel playground</title><link rel="icon" href="data:,">
 <style>body{font:16px system-ui;max-width:1000px;margin:2rem auto;padding:0 1rem;background:#f7f8fa;color:#20242a}textarea,pre{box-sizing:border-box;width:100%;font:14px ui-monospace,monospace;padding:1rem;background:white;border:1px solid #bbc3cc;border-radius:4px}textarea{height:230px}#stdin{height:85px}pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:340px;overflow:auto}button,input,select{font:inherit;padding:.4rem;margin:.3rem 0}label{display:block}#status{min-height:1.5em}</style>
 <h1>Liberty Eiffel playground</h1><p>Compile and run Eiffel entirely in your browser. <a href="./stage2/">Open the Eiffel-to-C compiler</a>.</p>
+<p><strong>Experimental beta — desktop Chrome or Edge recommended.</strong> The first run downloads about 33 MB and needs substantial browser memory. Small console programs are the current target; garbage collection, rescue/retry, graphics, and native bindings are unsupported.</p>
+<p>A project for <a href="https://beyond-tabs.com">Beyond Tabs</a> · <a href="https://github.com/andreamancuso/liberty-eiffel-wasm-playground">Source and issues</a>. Your source and program input stay in your browser.</p>
 <label>Source filename <input id="filename" value="hello.e" spellcheck="false"></label>
 <label for="source">Eiffel source</label><textarea id="source" spellcheck="false">class HELLO
 create {}

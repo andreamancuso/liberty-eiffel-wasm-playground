@@ -57,7 +57,16 @@ export async function readBuffer(name) {
     }
     const response = await fetch(new URL(url.href + '.gz'));
     if (!response.ok) throw new Error(`Cannot load ${name}: HTTP ${response.status}`);
-    return new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
+    // fetch decodes Content-Encoding automatically. Some static hosts serve .gz
+    // as opaque files, while others attach that header; support both deliveries.
+    let bytes = new Uint8Array(await response.arrayBuffer());
+    if (bytes[0] === 0x1f && bytes[1] === 0x8b)
+        bytes = new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer());
+    const valid = name.endsWith('.wasm')
+        ? bytes[0] === 0 && bytes[1] === 0x61 && bytes[2] === 0x73 && bytes[3] === 0x6d
+        : name === 'sysroot.tar' && bytes.length >= 1024 && bytes.length % 512 === 0 && new TextDecoder().decode(bytes.subarray(257, 262)) === 'ustar';
+    if (!valid) throw new Error(`Cannot load ${name}: invalid toolchain payload`);
+    return bytes.buffer;
 }
 export async function readModule(name) { return WebAssembly.compile(await readBuffer(name)); }
 

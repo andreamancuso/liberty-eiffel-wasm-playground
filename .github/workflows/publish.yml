@@ -1,0 +1,106 @@
+name: Publish Pages beta
+on:
+  workflow_dispatch:
+    inputs:
+      ci_run_id:
+        description: Successful main CI run ID to publish (also used for rollback)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-release
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      revision: ${{ steps.select.outputs.revision }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Select a successful main CI run
+        id: select
+        env:
+          CI_RUN_ID: ${{ inputs.ci_run_id }}
+          GH_TOKEN: ${{ github.token }}
+        run: python3 release/select-run.py
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: ${{ steps.select.outputs.artifact }}
+          run-id: ${{ inputs.ci_run_id }}
+          github-token: ${{ github.token }}
+          path: artifacts/pages
+      - name: Verify release identity and every file
+        env:
+          REVISION: ${{ steps.select.outputs.revision }}
+          RUN_ID: ${{ inputs.ci_run_id }}
+          RUN_URL: ${{ steps.select.outputs.run_url }}
+        run: python3 release/site.py verify --site artifacts/pages --revision "$REVISION" --run-id "$RUN_ID" --run-url "$RUN_URL"
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: artifacts/pages
+
+  deploy:
+    needs: prepare
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish verified artifact
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+
+  smoke:
+    needs: [prepare, deploy]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Build pinned browser verifier
+        run: docker build -f Dockerfile.stage3-browser -t liberty-pages-verifier .
+      - name: Test the actual HTTPS site
+        env:
+          SITE_URL: ${{ needs.deploy.outputs.url }}
+          EXPECTED_REVISION: ${{ needs.prepare.outputs.revision }}
+        run: |
+          mkdir -p artifacts/hosted
+          docker run --rm --env EXPECTED_REVISION --mount "type=bind,source=$PWD/artifacts/hosted,target=/reports" --entrypoint node liberty-pages-verifier /smoke/hosted-smoke.mjs "$SITE_URL"
+      - name: Upload hosted diagnostics
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: hosted-${{ github.run_id }}
+          path: artifacts/hosted/
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Release summary
+        if: always()
+        env:
+          SITE_URL: ${{ needs.deploy.outputs.url }}
+          REVISION: ${{ needs.prepare.outputs.revision }}
+          OUTCOME: ${{ job.status }}
+        run: |
+          echo "Site: $SITE_URL" >> "$GITHUB_STEP_SUMMARY"
+          echo "Revision: $REVISION; hosted verification: $OUTCOME" >> "$GITHUB_STEP_SUMMARY"
+          if test -f artifacts/hosted/hosted-result.json; then
+            python3 -c 'import json; r=json.load(open("artifacts/hosted/hosted-result.json")); print("\n".join("- %s: %s (%s ms)" % (x["name"], x["status"], round(x.get("elapsedMs", 0))) for x in r["results"]))' >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "If verification failed, the deployed site remains live. Roll back by dispatching this workflow with an earlier retained successful main CI run ID; see docs/publishing.md." >> "$GITHUB_STEP_SUMMARY"

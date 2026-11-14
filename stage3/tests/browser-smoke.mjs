@@ -5,29 +5,35 @@ import path from 'node:path';
 import { chromium } from 'playwright';
 import { hello, multi, invalid } from './stage2-fixtures.mjs';
 const root = '/artifacts', requests = [], errors = [], results = [];
+const basePath = process.env.SITE_BASE_PATH ?? '/liberty-eiffel-wasm-playground/';
+assert.match(basePath, /^\/(?:[a-zA-Z0-9_-]+\/)*$/);
+let encodedGzip = false;
 await rm(`${root}/stage3-result.json`, { force: true });
 const types = { '.html':'text/html', '.mjs':'text/javascript', '.wasm':'application/wasm', '.json':'application/json' };
 const server = createServer(async (req, res) => {
     try {
         const pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
-        const file = path.resolve(root, `.${pathname.endsWith('/') ? pathname + 'index.html' : pathname}`);
+        if (!pathname.startsWith(basePath)) { res.writeHead(404).end(); return; }
+        const relative = pathname.slice(basePath.length);
+        const file = path.resolve(root, relative.endsWith('/') || !relative ? relative + 'index.html' : relative);
         if (!file.startsWith(root + '/')) { res.writeHead(403).end(); return; }
         const content = await readFile(file);
         requests.push({ method:req.method, path:pathname, bytes:content.length });
-        res.writeHead(200, { 'Content-Type':types[path.extname(file)] ?? 'application/octet-stream', 'Cache-Control':'public,max-age=3600' }); res.end(content);
+        res.writeHead(200, { 'Content-Type':types[path.extname(file)] ?? 'application/octet-stream', 'Cache-Control': encodedGzip ? 'no-store' : 'public,max-age=3600', ...(encodedGzip && file.endsWith('.gz') ? { 'Content-Encoding':'gzip' } : {}) }); res.end(content);
     } catch { res.writeHead(404).end(); }
 });
 await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
 const origin = `http://127.0.0.1:${server.address().port}`;
+const siteUrl = origin + basePath;
 let browser;
 try {
     browser = await chromium.launch({ headless:true, args:['--no-sandbox'] });
     const context = await browser.newContext({ acceptDownloads:true });
-    context.on('request', req => { if (req.method() !== 'GET' || new URL(req.url()).origin !== origin) errors.push(`Unexpected request ${req.url()}`); });
+    context.on('request', req => { const url = new URL(req.url()); if (req.method() !== 'GET' || url.origin !== origin || !url.pathname.startsWith(basePath)) errors.push(`Unexpected request ${req.url()}`); });
     const page = await context.newPage();
     page.on('pageerror', error => errors.push(String(error)));
     page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
-    await page.goto(origin); await page.waitForFunction(() => !!window.stage3);
+    await page.goto(siteUrl); await page.waitForFunction(() => !!window.stage3);
     assert.equal(await page.evaluate(() => crossOriginIsolated), false);
     const record = (name, result) => {
         const { artifacts, stdout = '', stderr = '', ...rest } = result;
@@ -83,7 +89,7 @@ try {
         const broken=await browser.newContext();
         try {
             await broken.route('**/clang.wasm.gz',route=>route.fulfill({status:corrupt?200:404,body:corrupt?'broken gzip':'missing'}));
-            const p=await broken.newPage(); await p.goto(origin); await p.waitForFunction(()=>!!window.stage3);
+            const p=await broken.newPage(); await p.goto(siteUrl); await p.waitForFunction(()=>!!window.stage3);
             result=await p.evaluate(input=>window.stage3.buildAndRun(input),hello(marker));
             assert.equal(result.status,'initialization_error',result.error||result.diagnostics); assert.equal(result.stdout,'');
             assert.equal(await p.evaluate(()=>window.stage3.getActiveWorkerCount()),0); record(corrupt?'corrupt_clang':'missing_clang',result);
@@ -101,6 +107,18 @@ try {
     await page.locator('#source').fill(hello(marker+'_final').files['hello.e']); await page.locator('#run').click();
     await page.waitForFunction(()=>window.stage3.lastResult?.stdout?.includes('_final'),null,{timeout:600000});
     assert.equal(await page.evaluate(()=>window.stage3.lastResult.status),'success'); assert.deepEqual(errors,[]);
+    // A fresh context prevents the opaque response cache masking HTTP decoding.
+    encodedGzip = true;
+    const encodedContext = await browser.newContext();
+    try {
+        const encodedPage = await encodedContext.newPage();
+        await encodedPage.goto(siteUrl); await encodedPage.waitForFunction(() => !!window.stage3);
+        const encodedResult = await encodedPage.evaluate(input => window.stage3.buildAndRun(input), hello(marker+'_encoded'));
+        record('http_encoded_gzip', encodedResult);
+        assert.equal(encodedResult.status, 'success', encodedResult.diagnostics);
+        assert.equal(encodedResult.stdout, marker+'_encoded\n');
+        assert.equal(await encodedPage.evaluate(() => window.stage3.getActiveWorkerCount()), 0);
+    } finally { await encodedContext.close(); }
     const provenance=JSON.parse(await readFile(`${root}/stage2/provenance.json`,'utf8'));
     const assets=JSON.parse(await readFile(`${root}/toolchain/assets.json`,'utf8'));
     const toolchain=JSON.parse(await readFile(`${root}/toolchain/toolchain.lock.json`,'utf8'));

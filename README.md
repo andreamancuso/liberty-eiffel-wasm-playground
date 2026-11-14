@@ -49,6 +49,7 @@ garbage collection and rescue/retry are currently unsupported.
 - [Stage 2 guide: Eiffel-to-C API and measurements](stage2/README.md)
 - [Recorded stage 2 results](stage2-result.json)
 - [Stage 1 guide: ahead-of-time compilation experiment](docs/stage1.md)
+- [Standalone GitHub Pages beta: CI, manual publishing, and rollback](docs/publishing.md)
 
 Generated files, caches, logs, and screenshots remain under `artifacts/`, ignored
 by Git. `artifacts/stage3/stage3-browser.png` shows the verified browser harness.

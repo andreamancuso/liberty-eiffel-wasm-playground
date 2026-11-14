@@ -39,8 +39,9 @@ headers remain inspectable and downloadable. The stage 2 compiler is available
 at `/stage2/`.
 
 No COOP/COEP headers, SharedArrayBuffer, or external CDN is required. This stage
-targets desktop Chromium. Publishing and beyond-tabs.com integration are later
-work. Generated artifacts are ignored by Git.
+targets desktop Chromium. The standalone beta uses GitHub Pages with manual
+releases; beyond-tabs.com links to it. See [publishing](../docs/publishing.md)
+for CI, release verification, and rollback. Generated artifacts are ignored by Git.
 
 ## API and lifetime
 
