@@ -93,10 +93,6 @@ h1 {
   margin-bottom: 0.55rem;
   font-weight: 650;
 }
-.subtitle {
-  color: #64705f;
-  margin: 0;
-}
 .example-bar {
   display: flex;
   align-items: center;

@@ -20,9 +20,6 @@ export default function App() {
       <header className="page-header">
         <div>
           <h1>Liberty Eiffel playground</h1>
-          <p className="subtitle">
-            Pick an example. Change something. See what happens.
-          </p>
         </div>
       </header>
       <main>
