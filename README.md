@@ -1,6 +1,7 @@
 # Liberty Eiffel playground
 
-An online playground for learning and experimenting with Liberty Eiffel.
+An online playground for learning and experimenting with
+[Liberty Eiffel](https://github.com/LibertyEiffel/Liberty).
 Source code is compiled and executed entirely in the browser using WebAssembly.
 
 **[Open the playground](https://andreamancuso.github.io/liberty-eiffel-wasm-playground/)**
