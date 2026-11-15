@@ -14,6 +14,22 @@ WASI backend probe. Browser checks exercise the complete Eiffel-to-WASM path.
 The full site tests exercise lessons, errors, limits, recovery, editing, storage,
 and slow downloads under the same path prefix used on GitHub Pages.
 
+## Compiler development
+
+The default compiler source is the clean, pinned `liberty` submodule from the
+[Liberty fork](https://github.com/andreamancuso/Liberty). A separate checkout can
+be selected for compiler development:
+
+```powershell
+./build.ps1 -LibertySource ../liberty-fork
+```
+
+`-LibertySource` must point to the root of an existing Liberty Git checkout.
+Source overrides may contain uncommitted changes; the revision and source
+fingerprint are recorded in build provenance. Compiler changes are maintained
+in the Liberty fork, then brought into the playground by updating the submodule
+pin. Playground code and build tooling are maintained in this repository.
+
 ## Caching and verification
 
 Normal local builds use Docker's local layer cache. The native recipe is always
