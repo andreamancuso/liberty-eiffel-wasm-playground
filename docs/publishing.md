@@ -1,4 +1,4 @@
-# Publishing the standalone beta
+# Publishing
 
 The playground is a static application linked from beyond-tabs.com:
 
@@ -10,12 +10,12 @@ The public beta targets desktop Chrome and Edge. Its first run downloads roughly
 ## CI
 
 The `CI` workflow runs on pull requests, pushes to `main`, and manual dispatch.
-It recursively checks out the pinned Liberty fork, runs `build.ps1`, and
-builds the final candidate, and runs full browser acceptance once against its
-read-only files under `/liberty-eiffel-wasm-playground/`. A passing report records
-the tested inventory. Sealing compares that inventory with the candidate before
-adding `release.json`, then verifies the release. Diagnostics stay outside the
-site directory.
+It recursively checks out the pinned Liberty fork and runs `build.ps1` to build
+the final candidate. API/lesson and UI/network checks run against its read-only
+files under `/liberty-eiffel-wasm-playground/`. Both groups must pass with the
+same tested file inventory. Sealing compares that inventory with the candidate
+before adding `release.json`, then verifies the release. Diagnostics stay
+outside the site directory.
 Both opaque gzip and HTTP `Content-Encoding: gzip` delivery are tested.
 
 The first native bootstrap can take half an hour. CI allows 180 minutes and logs
@@ -47,7 +47,7 @@ configuration. No custom domain or special cross-origin headers are required.
 
 ## Publish a tested main build
 
-1. Merge changes into `main` and wait for its own `CI` run to succeed.
+1. Merge changes into `main` and wait for the corresponding `CI` run to succeed.
 2. Copy that run's numeric ID from its URL or workflow summary.
 3. Run **Actions → Publish Pages beta → Run workflow**, select `main`, and supply
    `ci_run_id`. Alternatively:
@@ -57,37 +57,40 @@ configuration. No custom domain or special cross-origin headers are required.
    ```
 
 The publisher accepts only a successful same-repository `main` run from `ci.yml`.
-It checks out the selected revision’s verifier, downloads and verifies its artifact, then uses the official Pages
-upload/deploy actions without rebuilding. Publishing is manual and serialized.
+It checks out the selected revision's verifier, downloads and verifies its
+artifact, then uses the official Pages upload/deploy actions without rebuilding.
+Publishing is manual and serialized.
 Only the deployment job gets Pages/OIDC write permissions; no long-lived
 deployment secret is needed.
 
-After deployment, the verifier from the selected release tests the public HTTPS address with Chromium, fresh edited
-source, UTF-8 stdin, visible Eiffel errors, quiet successful runs, Stop, and
-recovery. It checks the release revision, module/WASM delivery, and same-origin
-GET-only requests. The workflow summary links the site and reports timings;
-`hosted-<publishing-run-ID>` contains detailed results and a screenshot.
+After deployment, the verifier from the selected release tests the public HTTPS
+address with Chromium, fresh edited source, UTF-8 stdin, visible Eiffel errors,
+quiet successful runs, Stop, and recovery. It checks the release revision,
+module/WASM delivery, and same-origin GET-only requests. The workflow summary
+links the site and reports timings. `hosted-<publishing-run-ID>` contains detailed
+results and a screenshot.
 
 The learning workspace checks also cover contract failure navigation, class-file
 operations, local draft restoration, Reset, and keyboard Run. The full offline
 suite runs all example programs and verifies preconditions, postconditions with
 `old`, invariants, and operation when local storage is unavailable.
-The library-loan example adds final-state and business-rule contract checks;
-live verification also opens its direct link, triggers an unavailable-book
+The library-loan example adds checks for loan limits, borrowers, and object
+identity. Live verification also opens its direct link, triggers an unavailable-book
 failure, navigates to `library.e`, resets the example, and runs it successfully.
 
-A failed hosted check marks the workflow failed **after publication**, so that
-site remains live until another deployment. Inspect its diagnostics before
-linking or announcing the beta.
+A failed hosted check marks the workflow failed **after publication**. The
+deployed site remains live until a corrected release or rollback is published.
 
 ## Rollback
 
 Dispatch `publish.yml` again with an earlier successful main CI run ID whose
 artifact is still retained. This republishes the exact previous bytes and runs
-hosted verification again. Historical releases use their original browser Docker recipe; the new layout uses the recipe under `tests/browser`. If its artifact has expired, revert the affected
-change on `main`, let CI rebuild and verify it, then publish that new run.
+hosted verification again. The browser verifier is built from the Docker recipe
+available at the selected revision. If its artifact has expired, revert the
+affected change on `main`, let CI rebuild and verify it, then publish that new run.
 
-The package is portable static output and can later be hosted on lima-city.
-Assets and workers use relative paths. The loader supports opaque `.gz` files
-and HTTP-decoded gzip responses; the host must serve `.mjs` as JavaScript and
-`.wasm` as WebAssembly.
+## Other static hosts
+
+The generated site is portable static output. Assets and workers use relative
+paths. The loader supports opaque `.gz` files and HTTP-decoded gzip responses;
+the host must serve `.mjs` as JavaScript and `.wasm` as WebAssembly.

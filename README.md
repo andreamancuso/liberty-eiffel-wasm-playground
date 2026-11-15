@@ -1,10 +1,11 @@
 # Liberty Eiffel playground
 
 [Open the playground](https://andreamancuso.github.io/liberty-eiffel-wasm-playground/).
-Edit and run Eiffel entirely in your browser, with contracts, inheritance,
-generic collections, multiple class files, and optional standard input.
-Eight guided examples include a library-loan application. Drafts stay in your
-browser. The first run downloads approximately 25 MB on GitHub Pages.
+The playground compiles and runs Eiffel entirely in the browser, with contracts,
+inheritance, generic collections, multiple class files, and optional standard
+input. Eight guided examples include a library-loan application. Drafts are
+stored locally in the browser. The first run downloads approximately 25 MB on
+GitHub Pages.
 
 ## Build and verify
 
@@ -19,22 +20,23 @@ The build bootstraps Liberty, packages its browser compiler and C toolchain,
 builds the React interface, and runs compiler and browser regressions with
 external networking disabled. Output goes to `artifacts/site/`.
 The first native bootstrap can take half an hour; subsequent builds reuse layers.
-CI persists the expensive compiler caches and runs the full browser suite once
+CI persists compiler and toolchain caches and runs the full browser suite once
 against the final site in two independent groups. `-TestWorkers 1` runs the same
 checks serially. UI changes also receive a quick standalone workflow. See the
-build guide for test priorities, cold-build switches, and timings.
+[build guide](docs/building.md) for test priorities, cold-build switches, and timings.
 
-For compiler source development, use your fork checkout:
+A separate checkout of the Liberty fork can be selected for compiler development:
 
 ```powershell
-.\build.ps1 -LibertySource C:\dev\LibertyFork
+.\build.ps1 -LibertySource ..\liberty-fork
 ```
 
-The default source is the clean, pinned `liberty` submodule. Compiler fixes belong
-in the [Liberty fork](https://github.com/andreamancuso/Liberty), then in an updated
-submodule pin here. Playground code and tooling belong in this repository.
+The default compiler source is the clean, pinned `liberty` submodule. Compiler
+changes are maintained in the [Liberty fork](https://github.com/andreamancuso/Liberty).
+Updating the submodule pin brings those changes into the playground. This
+repository contains the playground and its build tooling.
 
-## Find your way around
+## Repository layout
 
 - `runtime/`: browser compilation, workers, downloads, and WASI execution.
 - `build/`: pinned Docker recipes and compiler/toolchain packaging.

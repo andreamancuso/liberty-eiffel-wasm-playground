@@ -34,7 +34,8 @@ uses a generic catalogue, and derives counts instead of caching them.
 The final site is browser-tested through a read-only mount by independent
 API/lesson and UI/network groups. Both must pass with identical file inventories
 before their reports can be combined. Release sealing requires both groups and
-rejects any change to the tested bytes. Browser reports and screenshots remain outside the candidate.
+rejects any change to the tested bytes. Browser reports and screenshots remain
+outside the candidate.
 
 Build and release metadata identify both playground and Liberty revisions.
 Generated assets and reports stay under ignored `artifacts/`; source control
